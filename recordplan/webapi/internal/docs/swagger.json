@@ -1,0 +1,9 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "接口文档",
+        "contact": {},
+        "version": "1.0.0"
+    },
+    "paths": {}
+}
