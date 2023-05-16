@@ -14,15 +14,15 @@ type getRes struct {
 	Recording bool `json:"recording"`
 }
 
-// @Summary	录像状态
-// @Description 查询指定的流的录像状态
-// @Tags		周计划
-// @Param		stream	path	string	true	"stream"
-// @Produce	json
-// @Success	200	{object}	getRes
-// @Failure	404	{object}	internal.Error
-// @Failure	500	{object}	internal.Error
-// @Router		/streams/{stream}/status [get]
+//	@Summary		录像状态
+//	@Description	查询指定的流的录像状态
+//	@Tags			周计划
+//	@Param			stream	path	string	true	"stream"
+//	@Produce		json
+//	@Success		200	{object}	getRes
+//	@Failure		404	{object}	internal.Error
+//	@Failure		500	{object}	internal.Error
+//	@Router			/streams/{stream}/status [get]
 func get(ctx *gin.Context) {
 	// // 参数
 	// var req getReq

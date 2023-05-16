@@ -23,15 +23,15 @@ type postReq struct {
 	Peroids [][]*db.TimePeroid `json:"peroids" binding:"required,min=1,max=7,dive,min=1,dive"`
 }
 
-// @Summary	添加
-// @Tags		周计划
-// @Param		data	body	postReq	true	"数据"
-// @Accept		json
-// @Produce	json
-// @Success	201	{object}	internal.IDResult[int64]
-// @Failure	400	{object}	internal.Error
-// @Failure	500	{object}	internal.Error
-// @Router		/week_plans [post]
+//	@Summary	添加
+//	@Tags		周计划
+//	@Param		data	body	postReq	true	"数据"
+//	@Accept		json
+//	@Produce	json
+//	@Success	201	{object}	internal.IDResult[int64]
+//	@Failure	400	{object}	internal.Error
+//	@Failure	500	{object}	internal.Error
+//	@Router		/week_plans [post]
 func post(ctx *gin.Context) {
 	// 参数
 	var req postReq
