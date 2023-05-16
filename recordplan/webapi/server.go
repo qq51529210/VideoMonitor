@@ -10,13 +10,15 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"recordplan/webapi/internal/docs"
+	weekplans "recordplan/webapi/week_plans"
 
 	"github.com/gin-gonic/gin"
 )
 
 // 服务实例
 var (
-	Ser server
+	ser   server
+	Serve = ser.Serve
 )
 
 // server 表示 http api 服务
@@ -41,6 +43,7 @@ func (s *server) Serve(port int) {
 func (s *server) initRouter() {
 	gin.SetMode(gin.ReleaseMode)
 	s.gin = gin.New()
+	s.ser.Handler = s.gin
 	// 文档
 	docs.SwaggerInfo.BasePath = "/"
 	s.gin.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -50,6 +53,7 @@ func (s *server) initRouter() {
 	// 中间件
 	s.gin.Use(global)
 	// 路由
+	weekplans.Init(s.gin)
 }
 
 // 全局第一个中间件
