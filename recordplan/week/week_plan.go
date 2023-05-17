@@ -1,4 +1,4 @@
-package weekplan
+package week
 
 import (
 	"bytes"

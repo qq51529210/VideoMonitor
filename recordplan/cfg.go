@@ -26,6 +26,8 @@ type cfgWeekPlan struct {
 	CheckInterval int `json:"checkInterval" yaml:"checkInterval" validate:"required,min=1"`
 	// 并发检查的个数，0 表示使用 CPU 的个数
 	Concurrency int `json:"concurrency" yaml:"concurrency" validate:"required,min=0"`
+	// API 调用的超时，单位秒
+	APICallTimeout int `json:"apiCallTimeout" yaml:"apiCallTimeout" validate:"required,min=1"`
 }
 
 // cfg 用于加载启动配置

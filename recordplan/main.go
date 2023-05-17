@@ -1,15 +1,15 @@
 package main
 
 import (
+	"recordplan/api"
 	"recordplan/db"
-	"recordplan/webapi"
-	"recordplan/weekplan"
+	"recordplan/week"
 
 	"github.com/qq51529210/log"
 )
 
-//	@Title		接口文档
-//	@version	1.0.0
+// @Title		接口文档
+// @version	1.0.0
 func main() {
 	defer func() {
 		log.Recover(recover())
@@ -25,10 +25,13 @@ func main() {
 		panic(err)
 	}
 	// 检查
-	err = weekplan.Run(_cfg.WeekPlan.CheckInterval, _cfg.WeekPlan.Concurrency)
+	err = week.Run(
+		_cfg.WeekPlan.CheckInterval,
+		_cfg.WeekPlan.Concurrency,
+		_cfg.WeekPlan.APICallTimeout)
 	if err != nil {
 		panic(err)
 	}
 	// api 服务
-	webapi.Serve(8001)
+	api.Serve(8001)
 }

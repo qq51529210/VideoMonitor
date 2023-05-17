@@ -13,11 +13,6 @@ type BaseModel struct {
 	TimeModel
 }
 
-// key 实现缓存的接口
-func (m *BaseModel) key() string {
-	return m.ID
-}
-
 // TimeModel 基本字段
 type TimeModel struct {
 	// 数据库的创建时间，时间戳，

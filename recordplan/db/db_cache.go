@@ -6,12 +6,8 @@ import (
 	"gorm.io/gorm"
 )
 
-type mapCacheKey[K int64 | string | WeekPlanStreamKey] interface {
-	key() K
-}
-
 // mapCache 用于缓存数据
-type mapCache[K int64 | string | WeekPlanStreamKey, M mapCacheKey[K]] struct {
+type mapCache[K comparable, M any] struct {
 	sync.Mutex
 	// 数据
 	d map[K]M
@@ -22,18 +18,24 @@ type mapCache[K int64 | string | WeekPlanStreamKey, M mapCacheKey[K]] struct {
 	// 创建函数
 	new func() M
 	//
-	key  func(*gorm.DB, K) *gorm.DB
-	keys func(*gorm.DB, []K) *gorm.DB
+	key       func(M) K
+	whereKey  func(*gorm.DB, K) *gorm.DB
+	whereKeys func(*gorm.DB, []K) *gorm.DB
 }
 
-func newMapCache[K int64 | string | WeekPlanStreamKey, M mapCacheKey[K]](
-	nf func() M, kf func(*gorm.DB, K) *gorm.DB, ksf func(*gorm.DB, []K) *gorm.DB) *mapCache[K, M] {
+// newMapCache 返回新的缓存
+func newMapCache[K comparable, M any](
+	newFunc func() M,
+	keyFunc func(M) K,
+	whereKeyFunc func(*gorm.DB, K) *gorm.DB,
+	whereKeysFunc func(*gorm.DB, []K) *gorm.DB) *mapCache[K, M] {
 	c := new(mapCache[K, M])
 	c.d = make(map[K]M)
-	c.new = nf
-	c.key = kf
-	c.keys = ksf
-	c.m = nf()
+	c.new = newFunc
+	c.key = keyFunc
+	c.whereKey = whereKeyFunc
+	c.whereKeys = whereKeysFunc
+	c.m = newFunc()
 	return c
 }
 
@@ -58,7 +60,7 @@ func (c *mapCache[K, M]) check() error {
 func (c *mapCache[K, M]) load(k K) {
 	// 读取
 	m := c.new()
-	err := _db.First(m).Error
+	err := c.whereKey(_db, k).First(m).Error
 	// 失败
 	if err != nil {
 		c.ok = false
@@ -80,7 +82,8 @@ func (c *mapCache[K, M]) loadAll() error {
 	}
 	// 内存
 	for _, model := range models {
-		c.d[model.key()] = model
+		k := c.key(model)
+		c.d[k] = model
 	}
 	return nil
 }
@@ -141,7 +144,7 @@ func (c *mapCache[K, M]) Add(m M) (int64, error) {
 	}
 	// 内存
 	if db.RowsAffected > 0 {
-		c.load(m.key())
+		c.load(c.key(m))
 	}
 	// 返回
 	return db.RowsAffected, nil
@@ -153,8 +156,8 @@ func (c *mapCache[K, M]) Update(m M) (int64, error) {
 	c.Lock()
 	defer c.Unlock()
 	// 数据库
-	k := m.key()
-	db := c.key(_db, k).Updates(m)
+	k := c.key(m)
+	db := c.whereKey(_db, k).Updates(m)
 	if db.Error != nil {
 		return db.RowsAffected, db.Error
 	}
@@ -172,8 +175,8 @@ func (c *mapCache[K, M]) Save(m M) (int64, error) {
 	c.Lock()
 	defer c.Unlock()
 	// 数据库
-	k := m.key()
-	db := c.key(_db, k).Save(m)
+	k := c.key(m)
+	db := c.whereKey(_db, k).Save(m)
 	if db.Error != nil {
 		return db.RowsAffected, db.Error
 	}
@@ -190,7 +193,7 @@ func (c *mapCache[K, M]) Delete(k K) (int64, error) {
 	c.Lock()
 	defer c.Unlock()
 	// 数据库
-	db := c.key(_db, k).Delete(c.m)
+	db := c.whereKey(_db, k).Delete(c.m)
 	if db.Error != nil {
 		return db.RowsAffected, db.Error
 	}
@@ -208,7 +211,7 @@ func (c *mapCache[K, M]) BatchDelete(ks []K) (int64, error) {
 	c.Lock()
 	defer c.Unlock()
 	// 数据库
-	db := c.keys(_db, ks).Delete(c.m)
+	db := c.whereKeys(_db, ks).Delete(c.m)
 	if db.Error != nil {
 		return db.RowsAffected, db.Error
 	}

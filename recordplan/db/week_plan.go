@@ -13,6 +13,9 @@ var (
 		func() *WeekPlan {
 			return new(WeekPlan)
 		},
+		func(m *WeekPlan) string {
+			return m.ID
+		},
 		func(db *gorm.DB, k string) *gorm.DB {
 			return db.Where("`ID` = ?", k)
 		},

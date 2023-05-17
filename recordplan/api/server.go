@@ -1,4 +1,4 @@
-package webapi
+package api
 
 import (
 	"fmt"
@@ -9,8 +9,8 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	"recordplan/webapi/internal/docs"
-	weekplans "recordplan/webapi/week_plans"
+	"recordplan/api/internal/docs"
+	weekplans "recordplan/api/week_plans"
 
 	"github.com/gin-gonic/gin"
 )

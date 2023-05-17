@@ -1,4 +1,4 @@
-package weekplan
+package week
 
 import (
 	"net/http"
@@ -33,10 +33,12 @@ type checker struct {
 	checkInterval time.Duration
 	// 并发数
 	concurrency int
+	// 调用超时
+	apiCallTimeout time.Duration
 }
 
 // init 初始化
-func (c *checker) init(checkInterval, concurrency int) error {
+func (c *checker) init(checkInterval, concurrency, apiTimeout int) error {
 	c.checkInterval = time.Duration(checkInterval) * time.Second
 	if c.checkInterval < 1 {
 		c.checkInterval = time.Second
@@ -44,6 +46,10 @@ func (c *checker) init(checkInterval, concurrency int) error {
 	c.concurrency = concurrency
 	if c.concurrency < 1 {
 		c.concurrency = runtime.NumCPU()
+	}
+	c.apiCallTimeout = time.Duration(apiTimeout) * time.Second
+	if c.apiCallTimeout < 1 {
+		c.apiCallTimeout = time.Second
 	}
 	// 数据库
 	models, err := db.GetWeekPlanAll()
@@ -135,24 +141,43 @@ func (c *checker) concurrencyCheckRoutine(now *time.Time, wps []*weekplan) {
 		wp.IsRecording = needRecord
 		// 需要录像，调用回调
 		if wp.IsRecording {
-			c.callback(wp.ID)
+			c.startCallback(wp.ID)
+		} else {
+			c.stopCallback(wp.ID)
 		}
 	}
 }
 
-// callback 调用 id 关联的所有 stream 的 callback
-func (c *checker) callback(id string) {
+// startCallback 调用 id 关联的所有 stream 的 StartCallback
+func (c *checker) startCallback(id string) {
 	// 数据库
 	models, err := db.GetWeekPlanStreamListByPlanID(id)
 	if err != nil {
-		log.Errorf("week plan %s record callback get db stream list error: %s", id, err.Error())
+		log.Errorf("week plan %s start callback get db stream list error: %s", id, err.Error())
 		return
 	}
 	// 回调
 	for _, model := range models {
-		err := util.HTTP[int, int](http.MethodGet, *model.Callback, nil, nil, nil, http.StatusOK, time.Second)
+		err := util.HTTP[int, int](http.MethodGet, *model.StartCallback, nil, nil, nil, http.StatusOK, c.apiCallTimeout)
 		if err != nil {
-			log.Errorf("week plan %s record stream %s callback error: %s", id, model.Stream, err.Error())
+			log.Errorf("week plan %s start callback stream %s error: %s", id, model.Stream, err.Error())
+		}
+	}
+}
+
+// stopCallback 调用 id 关联的所有 stream 的 StartCallback
+func (c *checker) stopCallback(id string) {
+	// 数据库
+	models, err := db.GetWeekPlanStreamListByPlanID(id)
+	if err != nil {
+		log.Errorf("week plan %s stop callback get db stream list error: %s", id, err.Error())
+		return
+	}
+	// 回调
+	for _, model := range models {
+		err := util.HTTP[int, int](http.MethodGet, *model.StopCallback, nil, nil, nil, http.StatusOK, c.apiCallTimeout)
+		if err != nil {
+			log.Errorf("week plan %s stop callback stream %s error: %s", id, model.Stream, err.Error())
 		}
 	}
 }

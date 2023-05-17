@@ -1,4 +1,4 @@
-package weekplan
+package week
 
 import "errors"
 
@@ -8,8 +8,8 @@ var (
 )
 
 // Run 启动后台检查
-func Run(checkInterval, concurrency int) error {
-	return _checker.init(checkInterval, concurrency)
+func Run(checkInterval, concurrency, apiTimeout int) error {
+	return _checker.init(checkInterval, concurrency, apiTimeout)
 }
 
 // Reload 加载内存，在添加和修改数据库后调用

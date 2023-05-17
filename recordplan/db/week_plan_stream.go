@@ -10,6 +10,9 @@ var (
 		func() *WeekPlanStream {
 			return new(WeekPlanStream)
 		},
+		func(m *WeekPlanStream) WeekPlanStreamKey {
+			return m.WeekPlanStreamKey
+		},
 		func(db *gorm.DB, k WeekPlanStreamKey) *gorm.DB {
 			return db.Where("`Stream` = ? AND `WeekPlanID` = ?", k.Stream, k.WeekPlanID)
 		},
@@ -31,20 +34,21 @@ var (
 )
 
 type WeekPlanStreamKey struct {
-	Stream     string
-	WeekPlanID string
+	// 用于查询，最大 128 个字符
+	Stream string `json:"stream" gorm:"primary;varchar(64)"`
+	// WeekPlan.ID
+	WeekPlanID string `json:"WeekPlanStreamID" gorm:"primaryKey;varchar(32)"`
 }
 
 // WeekPlan 表示周计划
 // Stream 和 WeekPlanID 是多对多的关系
 type WeekPlanStream struct {
-	// 用于查询，最大 128 个字符
-	Stream string `json:"stream" gorm:"primary;char(128)"`
-	// WeekPlan.ID
-	WeekPlanID string    `json:"WeekPlanStreamID" gorm:"primaryKey;char(32)"`
-	WeekPlan   *WeekPlan `json:"-" gorm:"foreignKey:WeekPlanID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	// 回调
-	Callback *string `json:"callback" gorm:"type:text"`
+	WeekPlanStreamKey
+	WeekPlan *WeekPlan `json:"-" gorm:"foreignKey:WeekPlanID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	// 开始录像的回调，Get 方法
+	StartCallback *string `json:"startCallback" gorm:"type:varchar(512)"`
+	// 停止录像的回调，Get 方法
+	StopCallback *string `json:"stopCallback" gorm:"type:varchar(512)"`
 }
 
 // key 实现缓存的接口
@@ -60,7 +64,7 @@ type WeekPlanStreamQuery struct {
 	// ID，精确匹配
 	Stream string `form:"stream" binding:"omitempty,min=1"`
 	// WeekPlan.ID，精确匹配
-	WeekPlanID *int64 `form:"WeekPlanStreamID" binding:"omitempty,min=1"`
+	WeekPlanID string `form:"WeekPlanStreamID" binding:"omitempty,min=1"`
 }
 
 // Init 实现 Query 接口
@@ -70,8 +74,8 @@ func (q *WeekPlanStreamQuery) Init(db *gorm.DB) *gorm.DB {
 		db = db.Where("`Stream` = ?", q.Stream)
 	}
 	// WeekPlan.ID
-	if q.WeekPlanID != nil {
-		db = db.Where("`WeekPlanID` = ?", *q.WeekPlanID)
+	if q.WeekPlanID != "" {
+		db = db.Where("`WeekPlanID` = ?", q.WeekPlanID)
 	}
 	//
 	return db

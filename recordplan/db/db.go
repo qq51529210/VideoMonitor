@@ -71,5 +71,6 @@ func createMysqlSchema(uri string) error {
 func initTable() error {
 	return _db.AutoMigrate(
 		&WeekPlan{},
+		&WeekPlanStream{},
 	)
 }
