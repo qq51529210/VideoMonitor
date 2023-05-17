@@ -32,7 +32,7 @@ definitions:
         type: integer
       id:
         description: 数据库ID
-        type: integer
+        type: string
       name:
         description: 名称
         type: string
@@ -65,6 +65,12 @@ definitions:
       row:
         description: 行数
         type: integer
+    type: object
+  streams.getRes:
+    properties:
+      recording:
+        description: 是否需要录像
+        type: boolean
     type: object
   weekplans.patchReq:
     properties:
@@ -132,6 +138,33 @@ info:
   title: 接口文档
   version: 1.0.0
 paths:
+  /streams/{stream}/status:
+    get:
+      description: 查询指定的流的录像状态
+      parameters:
+      - description: stream
+        in: path
+        name: stream
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/streams.getRes'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal.Error'
+      summary: 录像状态
+      tags:
+      - 周计划
   /week_plans:
     delete:
       consumes:
@@ -143,7 +176,7 @@ paths:
         required: true
         schema:
           items:
-            type: integer
+            type: string
           type: array
       produces:
       - application/json
@@ -271,11 +304,11 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: 数据库 ID
+      - description: WeekPlan.ID
         in: path
         name: id
         required: true
-        type: integer
+        type: string
       responses:
         "204":
           description: No Content
@@ -296,11 +329,11 @@ paths:
       - 周计划
     get:
       parameters:
-      - description: 数据库 ID
+      - description: WeekPlan.ID
         in: path
         name: id
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
@@ -327,7 +360,7 @@ paths:
         in: path
         name: id
         required: true
-        type: integer
+        type: string
       - description: 数据
         in: body
         name: data

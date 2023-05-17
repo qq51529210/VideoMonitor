@@ -16,6 +16,47 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/streams/{stream}/status": {
+            "get": {
+                "description": "查询指定的流的录像状态",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "周计划"
+                ],
+                "summary": "录像状态",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "stream",
+                        "name": "stream",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/streams.getRes"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/internal.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/week_plans": {
             "get": {
                 "produces": [
@@ -186,7 +227,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "integer"
+                                "type": "string"
                             }
                         }
                     }
@@ -230,8 +271,8 @@ const docTemplate = `{
                 "summary": "详情",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "数据库 ID",
+                        "type": "string",
+                        "description": "WeekPlan.ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -268,8 +309,8 @@ const docTemplate = `{
                 "summary": "删除",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "数据库 ID",
+                        "type": "string",
+                        "description": "WeekPlan.ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -312,7 +353,7 @@ const docTemplate = `{
                 "summary": "修改",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "WeekPlan.ID",
                         "name": "id",
                         "in": "path",
@@ -394,7 +435,7 @@ const docTemplate = `{
                 },
                 "id": {
                     "description": "数据库ID",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "name": {
                     "description": "名称",
@@ -441,6 +482,15 @@ const docTemplate = `{
                 "row": {
                     "description": "行数",
                     "type": "integer"
+                }
+            }
+        },
+        "streams.getRes": {
+            "type": "object",
+            "properties": {
+                "recording": {
+                    "description": "是否需要录像",
+                    "type": "boolean"
                 }
             }
         },

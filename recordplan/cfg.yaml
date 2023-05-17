@@ -2,4 +2,7 @@ name: record-plan-service-1
 port: 8001
 log:
 db:
+ url: root:1231@tcp(127.0.0.1:3306)/recordplan?charset=utf8mb4
 weekPlan:
+ checkInterval: 10
+ concurrency: 1

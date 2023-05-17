@@ -1,7 +1,10 @@
 package main
 
 import (
+	"os"
+
 	"github.com/go-playground/validator/v10"
+	"github.com/qq51529210/util"
 )
 
 var (
@@ -34,12 +37,22 @@ type cfg struct {
 	WeekPlan cfgWeekPlan `json:"weekPlan" yaml:"weekPlan"`
 }
 
-func loadCfg() {
+// loadCfg 加载配置
+func loadCfg() error {
 	// 加载
+	path := "cfg.yaml"
+	if len(os.Args) > 1 {
+		path = os.Args[1]
+	}
+	err := util.ReadCfg(path, &_cfg)
+	if err != nil {
+		return err
+	}
 	// 检查
 	val := validator.New()
-	err := val.Struct(_cfg)
+	err = val.Struct(_cfg)
 	if err != nil {
-		panic(err)
+		return err
 	}
+	return nil
 }

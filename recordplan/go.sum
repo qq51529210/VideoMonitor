@@ -83,6 +83,8 @@ github.com/qq51529210/log v0.0.0-20230516063534-80e6e0a1e8f6 h1:5ViSbwq/24efFPX2
 github.com/qq51529210/log v0.0.0-20230516063534-80e6e0a1e8f6/go.mod h1:KNst4Vi8xIt79oTgW1o33f05F/DEHdjnod7XGNjyDBE=
 github.com/qq51529210/util v0.0.0-20230514151549-f4a27fe84673 h1:ZKfPO5H/tQzfKOFFcwTfPweBsAbw2S0HSCfm8bI1Kic=
 github.com/qq51529210/util v0.0.0-20230514151549-f4a27fe84673/go.mod h1:aDPgyD19ZRXA9Pt9Ll5kilj4nwuPsrgqbgC55HntEeM=
+github.com/qq51529210/util v0.0.0-20230515153215-3c5901d33a40 h1:CUR5lwYsDNOeIZwR+UKisB/Zf/SdnRweFlwy6tGHS4A=
+github.com/qq51529210/util v0.0.0-20230515153215-3c5901d33a40/go.mod h1:sxjKwImriboycX5PcVdhL7W8R0G1mTCafJhaiFXyXxM=
 github.com/qq51529210/uuid v0.0.0-20230116075911-debb68a3e58d h1:1hk5etKid1BJkphrA7b5rN1Wf9XxA9JTPdVpUdOXEuI=
 github.com/qq51529210/uuid v0.0.0-20230116075911-debb68a3e58d/go.mod h1:rLhoeKg/nnMBCuMzh/iqs9z1hL2PI6WPLLq16qgUVsA=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
