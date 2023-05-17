@@ -19,8 +19,8 @@ type postReq struct {
 	Enable *int8 `json:"enable" binding:"omitempty,oneof=0 1"`
 	// 保存的天数，默认是 1
 	SaveDays *uint32 `json:"saveDays" binding:"omitempty,min=1"`
-	// 是一个 RecordTime 的 JSON 数组
-	Peroids [][]*db.TimePeroid `json:"peroids" binding:"required,min=1,max=7,dive,min=1,dive"`
+	// 一周的时间数组
+	Peroids [][]*db.TimePeroid `json:"peroids" binding:"required,min=1,max=7,dive,required,min=1,dive"`
 }
 
 //	@Summary	添加

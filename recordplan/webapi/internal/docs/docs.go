@@ -234,10 +234,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "204": {
-                        "description": "No Content",
-                        "schema": {
-                            "$ref": "#/definitions/internal.RowResult"
-                        }
+                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -496,6 +493,9 @@ const docTemplate = `{
         },
         "weekplans.patchReq": {
             "type": "object",
+            "required": [
+                "peroids"
+            ],
             "properties": {
                 "enable": {
                     "description": "是否禁用\n0: 禁用\n1: 启用",
@@ -511,7 +511,7 @@ const docTemplate = `{
                     "maxLength": 32
                 },
                 "peroids": {
-                    "description": "是一个 RecordTime 的 JSON 数组",
+                    "description": "一周的时间数组",
                     "type": "array",
                     "maxItems": 7,
                     "minItems": 1,
@@ -550,7 +550,7 @@ const docTemplate = `{
                     "maxLength": 32
                 },
                 "peroids": {
-                    "description": "是一个 RecordTime 的 JSON 数组",
+                    "description": "一周的时间数组",
                     "type": "array",
                     "maxItems": 7,
                     "minItems": 1,

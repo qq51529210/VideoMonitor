@@ -1,6 +1,10 @@
 package db
 
-import "sync"
+import (
+	"sync"
+
+	"gorm.io/gorm"
+)
 
 type mapCacheKey[K int64 | string | WeekPlanStreamKey] interface {
 	key() K
@@ -17,12 +21,18 @@ type mapCache[K int64 | string | WeekPlanStreamKey, M mapCacheKey[K]] struct {
 	ok bool
 	// 创建函数
 	new func() M
+	//
+	key  func(*gorm.DB, K) *gorm.DB
+	keys func(*gorm.DB, []K) *gorm.DB
 }
 
-func newMapCache[K int64 | string | WeekPlanStreamKey, M mapCacheKey[K]](nf func() M) *mapCache[K, M] {
+func newMapCache[K int64 | string | WeekPlanStreamKey, M mapCacheKey[K]](
+	nf func() M, kf func(*gorm.DB, K) *gorm.DB, ksf func(*gorm.DB, []K) *gorm.DB) *mapCache[K, M] {
 	c := new(mapCache[K, M])
 	c.d = make(map[K]M)
 	c.new = nf
+	c.key = kf
+	c.keys = ksf
 	c.m = nf()
 	return c
 }
@@ -143,25 +153,27 @@ func (c *mapCache[K, M]) Update(m M) (int64, error) {
 	c.Lock()
 	defer c.Unlock()
 	// 数据库
-	db := _db.Updates(m)
+	k := m.key()
+	db := c.key(_db, k).Updates(m)
 	if db.Error != nil {
 		return db.RowsAffected, db.Error
 	}
 	// 内存
 	if db.RowsAffected > 0 {
-		c.load(m.key())
+		c.load(k)
 	}
 	// 返回
 	return db.RowsAffected, nil
 }
 
 // Save 保存
-func (c *mapCache[K, M]) Save(k K, m *M) (int64, error) {
+func (c *mapCache[K, M]) Save(m M) (int64, error) {
 	// 上锁
 	c.Lock()
 	defer c.Unlock()
 	// 数据库
-	db := _db.Save(m)
+	k := m.key()
+	db := c.key(_db, k).Save(m)
 	if db.Error != nil {
 		return db.RowsAffected, db.Error
 	}
@@ -178,7 +190,7 @@ func (c *mapCache[K, M]) Delete(k K) (int64, error) {
 	c.Lock()
 	defer c.Unlock()
 	// 数据库
-	db := _db.Delete(c.m, k)
+	db := c.key(_db, k).Delete(c.m)
 	if db.Error != nil {
 		return db.RowsAffected, db.Error
 	}
@@ -196,7 +208,7 @@ func (c *mapCache[K, M]) BatchDelete(ks []K) (int64, error) {
 	c.Lock()
 	defer c.Unlock()
 	// 数据库
-	db := _db.Delete(c.m, ks)
+	db := c.keys(_db, ks).Delete(c.m)
 	if db.Error != nil {
 		return db.RowsAffected, db.Error
 	}

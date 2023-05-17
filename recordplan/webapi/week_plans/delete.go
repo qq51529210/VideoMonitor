@@ -27,15 +27,13 @@ func delete(ctx *gin.Context) {
 		return
 	}
 	// 数据库
-	rows, err := db.DeleteWeekPlan(id.ID)
+	_, err = db.DeleteWeekPlan(id.ID)
 	if err != nil {
 		internal.HandleDB500(ctx, err)
 		return
 	}
 	// 返回
-	ctx.JSON(http.StatusNoContent, &internal.RowResult{
-		Row: rows,
-	})
+	ctx.Status(http.StatusNoContent)
 }
 
 //	@Summary	批量删除
@@ -44,7 +42,7 @@ func delete(ctx *gin.Context) {
 //	@Security	ApiKeyAuth
 //	@Accept		json
 //	@Produce	json
-//	@Success	204	{object}	internal.RowResult
+//	@Success	204
 //	@Failure	400	{object}	internal.Error
 //	@Failure	401
 //	@Failure	403
@@ -59,13 +57,11 @@ func batchDelete(ctx *gin.Context) {
 		return
 	}
 	// 数据库
-	rows, err := db.BatchDeleteWeekPlan(req.ID)
+	_, err = db.BatchDeleteWeekPlan(req.ID)
 	if err != nil {
 		internal.HandleDB500(ctx, err)
 		return
 	}
 	// 返回
-	ctx.JSON(http.StatusNoContent, &internal.RowResult{
-		Row: rows,
-	})
+	ctx.Status(http.StatusNoContent)
 }

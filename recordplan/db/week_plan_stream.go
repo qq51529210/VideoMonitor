@@ -6,7 +6,16 @@ import (
 
 var (
 	// 缓存
-	weekPlanStreamCache = newMapCache[WeekPlanStreamKey](func() *WeekPlanStream { return new(WeekPlanStream) })
+	weekPlanStreamCache = newMapCache(
+		func() *WeekPlanStream {
+			return new(WeekPlanStream)
+		},
+		func(db *gorm.DB, k WeekPlanStreamKey) *gorm.DB {
+			return db.Where("`Stream` = ? AND `WeekPlanID` = ?", k.Stream, k.WeekPlanID)
+		},
+		func(db *gorm.DB, ks []WeekPlanStreamKey) *gorm.DB {
+			return db.Where("(`Stream`, `WeekPlanID`) IN ?", ks)
+		})
 	// GetWeekPlanStream 返回指定 id 的缓存
 	GetWeekPlanStream = weekPlanStreamCache.Get
 	// GetWeekPlanStreamAll 返回所有缓存

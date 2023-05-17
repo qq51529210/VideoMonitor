@@ -40,6 +40,7 @@ func initDB(uri string) error {
 		SingularTable: true,
 		NoLowerCase:   true,
 	}
+	config.Logger = &gormLog{}
 	// mysql
 	err := createMysqlSchema(uri)
 	if err != nil {

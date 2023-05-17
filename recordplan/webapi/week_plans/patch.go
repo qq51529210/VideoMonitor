@@ -19,8 +19,8 @@ type patchReq struct {
 	Enable *int8 `json:"enable" binding:"omitempty,oneof=0 1"`
 	// 保存的天数
 	SaveDays *uint32 `json:"saveDays" binding:"omitempty,min=1"`
-	// 是一个 RecordTime 的 JSON 数组
-	Peroids [][]*db.TimePeroid `json:"peroids" binding:"omitempty,min=1,max=7,dive,timePeroid"`
+	// 一周的时间数组
+	Peroids [][]*db.TimePeroid `json:"peroids" binding:"omitempty,min=1,max=7,dive,required,min=1,dive"`
 }
 
 //	@Summary	修改
@@ -36,7 +36,7 @@ type patchReq struct {
 func patch(ctx *gin.Context) {
 	// 参数
 	var id internal.IDPath[string]
-	err := ctx.ShouldBindJSON(&id.ID)
+	err := ctx.ShouldBindUri(&id)
 	if err != nil {
 		internal.Handle400(ctx, err)
 		return

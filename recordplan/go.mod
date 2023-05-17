@@ -7,7 +7,7 @@ require (
 	github.com/go-playground/validator/v10 v10.13.0
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/qq51529210/log v0.0.0-20230516063534-80e6e0a1e8f6
-	github.com/qq51529210/util v0.0.0-20230515153215-3c5901d33a40
+	github.com/qq51529210/util v0.0.0-20230517142048-a7fcc43cf037
 	github.com/qq51529210/uuid v0.0.0-20230116075911-debb68a3e58d
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0

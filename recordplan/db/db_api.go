@@ -9,10 +9,11 @@ import (
 // BaseModel 基本字段
 type BaseModel struct {
 	// 数据库ID
-	ID string `json:"id" form:"id" uri:"id" gorm:"primaryKey;char(32)"`
+	ID string `json:"id" gorm:"primaryKey;type:varchar(40)"`
 	TimeModel
 }
 
+// key 实现缓存的接口
 func (m *BaseModel) key() string {
 	return m.ID
 }

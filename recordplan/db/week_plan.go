@@ -9,7 +9,16 @@ const (
 
 var (
 	// 缓存
-	weekPlanCache = newMapCache[string](func() *WeekPlan { return new(WeekPlan) })
+	weekPlanCache = newMapCache(
+		func() *WeekPlan {
+			return new(WeekPlan)
+		},
+		func(db *gorm.DB, k string) *gorm.DB {
+			return db.Where("`ID` = ?", k)
+		},
+		func(db *gorm.DB, ks []string) *gorm.DB {
+			return db.Where("`ID` IN ?", ks)
+		})
 	// GetWeekPlan 返回指定 id 的缓存
 	GetWeekPlan = weekPlanCache.Get
 	// GetWeekPlanAll 返回所有缓存

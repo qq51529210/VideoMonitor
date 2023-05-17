@@ -88,7 +88,7 @@ definitions:
         maxLength: 32
         type: string
       peroids:
-        description: 是一个 RecordTime 的 JSON 数组
+        description: 一周的时间数组
         items:
           items:
             $ref: '#/definitions/db.TimePeroid'
@@ -100,6 +100,8 @@ definitions:
         description: 保存的天数
         minimum: 1
         type: integer
+    required:
+    - peroids
     type: object
   weekplans.postReq:
     properties:
@@ -117,7 +119,7 @@ definitions:
         maxLength: 32
         type: string
       peroids:
-        description: 是一个 RecordTime 的 JSON 数组
+        description: 一周的时间数组
         items:
           items:
             $ref: '#/definitions/db.TimePeroid'
@@ -183,8 +185,6 @@ paths:
       responses:
         "204":
           description: No Content
-          schema:
-            $ref: '#/definitions/internal.RowResult'
         "400":
           description: Bad Request
           schema:
