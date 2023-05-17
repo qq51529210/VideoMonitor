@@ -1,12 +1,14 @@
 package weekplan
 
 import (
+	"net/http"
 	"recordplan/db"
 	"runtime"
 	"sync"
 	"time"
 
 	"github.com/qq51529210/log"
+	"github.com/qq51529210/util"
 )
 
 var (
@@ -130,8 +132,28 @@ func (c *checker) concurrencyCheckRoutine(now *time.Time, wps []*weekplan) {
 				break
 			}
 		}
-		// 需要录像
 		wp.IsRecording = needRecord
+		// 需要录像，调用回调
+		if wp.IsRecording {
+			c.callback(wp.ID)
+		}
+	}
+}
+
+// callback 调用 id 关联的所有 stream 的 callback
+func (c *checker) callback(id string) {
+	// 数据库
+	models, err := db.GetWeekPlanStreamListByPlanID(id)
+	if err != nil {
+		log.Errorf("week plan %s record callback get db stream list error: %s", id, err.Error())
+		return
+	}
+	// 回调
+	for _, model := range models {
+		err := util.HTTP[int, int](http.MethodGet, *model.Callback, nil, nil, nil, http.StatusOK, time.Second)
+		if err != nil {
+			log.Errorf("week plan %s record stream %s callback error: %s", id, model.Stream, err.Error())
+		}
 	}
 }
 
