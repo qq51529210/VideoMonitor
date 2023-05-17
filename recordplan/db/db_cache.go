@@ -2,12 +2,12 @@ package db
 
 import "sync"
 
-type mapCacheKey[K any] interface {
+type mapCacheKey[K int64 | string | WeekPlanStreamKey] interface {
 	key() K
 }
 
 // mapCache 用于缓存数据
-type mapCache[K int64 | string, M mapCacheKey[K]] struct {
+type mapCache[K int64 | string | WeekPlanStreamKey, M mapCacheKey[K]] struct {
 	sync.Mutex
 	// 数据
 	d map[K]M
@@ -19,7 +19,7 @@ type mapCache[K int64 | string, M mapCacheKey[K]] struct {
 	new func() M
 }
 
-func newMapCache[K int64 | string, M mapCacheKey[K]](nf func() M) *mapCache[K, M] {
+func newMapCache[K int64 | string | WeekPlanStreamKey, M mapCacheKey[K]](nf func() M) *mapCache[K, M] {
 	c := new(mapCache[K, M])
 	c.d = make(map[K]M)
 	c.new = nf
