@@ -33,6 +33,11 @@ func Init(uri string) error {
 	if err != nil {
 		return err
 	}
+	// 数据
+	err = initData()
+	if err != nil {
+		return err
+	}
 	//
 	return nil
 }
@@ -75,7 +80,17 @@ func createMysqlSchema(uri string) error {
 // initTable 创建表
 func initTable() error {
 	return _db.AutoMigrate(
+		&AppConfig{},
 		&WeekPlan{},
 		&WeekPlanStream{},
 	)
+}
+
+// initData 写入默认数据
+func initData() error {
+	err := initAppConfig()
+	if err != nil {
+		return err
+	}
+	return nil
 }

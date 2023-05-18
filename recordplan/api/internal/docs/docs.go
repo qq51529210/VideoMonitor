@@ -16,47 +16,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/streams/{stream}/status": {
-            "get": {
-                "description": "查询指定的流的录像状态",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "周计划"
-                ],
-                "summary": "录像状态",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "stream",
-                        "name": "stream",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/streams.getRes"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/internal.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/internal.Error"
-                        }
-                    }
-                }
-            }
-        },
         "/week_plans": {
             "get": {
                 "produces": [
@@ -578,15 +537,6 @@ const docTemplate = `{
                 }
             }
         },
-        "streams.getRes": {
-            "type": "object",
-            "properties": {
-                "recording": {
-                    "description": "是否需要录像",
-                    "type": "boolean"
-                }
-            }
-        },
         "streams.stream": {
             "type": "object",
             "required": [
@@ -701,6 +651,8 @@ var SwaggerInfo = &swag.Spec{
 	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
+	LeftDelim:        "{{",
+	RightDelim:       "}}",
 }
 
 func init() {

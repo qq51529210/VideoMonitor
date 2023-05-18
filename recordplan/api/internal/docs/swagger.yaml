@@ -66,12 +66,6 @@ definitions:
         description: 行数
         type: integer
     type: object
-  streams.getRes:
-    properties:
-      recording:
-        description: 是否需要录像
-        type: boolean
-    type: object
   streams.stream:
     properties:
       startCallback:
@@ -158,33 +152,6 @@ info:
   title: 接口文档
   version: 1.0.0
 paths:
-  /streams/{stream}/status:
-    get:
-      description: 查询指定的流的录像状态
-      parameters:
-      - description: stream
-        in: path
-        name: stream
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/streams.getRes'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/internal.Error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/internal.Error'
-      summary: 录像状态
-      tags:
-      - 周计划
   /week_plans:
     delete:
       consumes:
