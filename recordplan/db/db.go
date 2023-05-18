@@ -13,6 +13,11 @@ import (
 )
 
 var (
+	Enable  = int8(1)
+	Disable = int8(0)
+)
+
+var (
 	_db *gorm.DB
 )
 

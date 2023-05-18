@@ -9,14 +9,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Summary	列表
-// @Tags		周计划
-// @Param		query	query	db.WeekPlanQuery	false	"条件"
-// @Produce	json
-// @Success	200	{object}	db.ListData[db.WeekPlan]
-// @Failure	400	{object}	internal.Error
-// @Failure	500	{object}	internal.Error
-// @Router		/week_plans [get]
+//	@Summary	列表
+//	@Tags		周计划
+//	@Param		query	query	db.WeekPlanQuery	false	"条件"
+//	@Produce	json
+//	@Success	200	{object}	db.ListData[db.WeekPlan]
+//	@Failure	400	{object}	internal.Error
+//	@Failure	500	{object}	internal.Error
+//	@Router		/week_plans [get]
 func list(ctx *gin.Context) {
 	// 参数
 	var req db.WeekPlanQuery

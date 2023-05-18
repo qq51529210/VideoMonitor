@@ -33,11 +33,52 @@ var (
 	BatchDeleteWeekPlanStream = weekPlanStreamCache.BatchDelete
 )
 
+// BatchAddWeekPlanStream 批量添加
+func BatchAddWeekPlanStream(models []*WeekPlanStream) (int64, error) {
+	// 先更新数据库
+	rows, err := batchAddWeekPlanStream(models)
+	if err != nil {
+		return rows, err
+	}
+	// 缓存
+	if *AppCfg.EnableCache == 1 {
+		// 上锁
+		weekPlanStreamCache.Lock()
+		defer weekPlanStreamCache.Unlock()
+		// 加载
+		for i := 0; i < len(models); i++ {
+			// 失败一次就算了，等下次全部加载
+			err = weekPlanStreamCache.load(models[i].WeekPlanStreamKey)
+			if err != nil {
+				break
+			}
+		}
+	}
+	return rows, nil
+}
+
+// batchAddWeekPlanStream 批量添加
+func batchAddWeekPlanStream(models []*WeekPlanStream) (int64, error) {
+	rows := int64(0)
+	err := _db.Transaction(func(tx *gorm.DB) error {
+		db := tx.Save(models)
+		if db.Error != nil {
+			return db.Error
+		}
+		rows = db.RowsAffected
+		return nil
+	})
+	if err != nil {
+		return 0, err
+	}
+	return rows, nil
+}
+
 type WeekPlanStreamKey struct {
 	// 用于查询，最大 128 个字符
-	Stream string `json:"stream" gorm:"primary;varchar(64)"`
+	Stream string `json:"stream" gorm:"primaryKey;type:varchar(64)"`
 	// WeekPlan.ID
-	WeekPlanID string `json:"WeekPlanStreamID" gorm:"primaryKey;varchar(32)"`
+	WeekPlanID string `json:"WeekPlanStreamID" gorm:"primaryKey;type:varchar(32)"`
 }
 
 // WeekPlan 表示周计划
@@ -49,14 +90,8 @@ type WeekPlanStream struct {
 	StartCallback *string `json:"startCallback" gorm:"type:varchar(512)"`
 	// 停止录像的回调，Get 方法
 	StopCallback *string `json:"stopCallback" gorm:"type:varchar(512)"`
-}
-
-// key 实现缓存的接口
-func (m *WeekPlanStream) key() WeekPlanStreamKey {
-	return WeekPlanStreamKey{
-		Stream:     m.Stream,
-		WeekPlanID: m.WeekPlanID,
-	}
+	// 用于版本控制
+	Version int64 `gorm:"autoUpdateTime:nano"`
 }
 
 // WeekPlanStreamQuery 是 WeekPlanStream 的查询参数

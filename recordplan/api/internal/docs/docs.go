@@ -323,12 +323,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/internal.Error"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -372,6 +366,108 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/internal.RowResult"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/internal.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/week_plans/{id}/streams": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "周计划"
+                ],
+                "summary": "关联流",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "WeekPlan.ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "流标识数组",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/streams.stream"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/internal.IDResult-int64"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/internal.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal.Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "周计划"
+                ],
+                "summary": "解绑流",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "WeekPlan.ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "流标识数组",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -488,6 +584,30 @@ const docTemplate = `{
                 "recording": {
                     "description": "是否需要录像",
                     "type": "boolean"
+                }
+            }
+        },
+        "streams.stream": {
+            "type": "object",
+            "required": [
+                "startCallback",
+                "stopCallback",
+                "stream"
+            ],
+            "properties": {
+                "startCallback": {
+                    "description": "开始录像回调",
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "stopCallback": {
+                    "description": "停止录像回调",
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "stream": {
+                    "description": "流的唯一标识",
+                    "type": "string"
                 }
             }
         },

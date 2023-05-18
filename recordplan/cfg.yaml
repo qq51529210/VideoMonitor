@@ -6,3 +6,4 @@ db:
 weekPlan:
  checkInterval: 10
  concurrency: 1
+ apiCallTimeout: 3

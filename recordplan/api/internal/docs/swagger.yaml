@@ -72,6 +72,24 @@ definitions:
         description: 是否需要录像
         type: boolean
     type: object
+  streams.stream:
+    properties:
+      startCallback:
+        description: 开始录像回调
+        maxLength: 255
+        type: string
+      stopCallback:
+        description: 停止录像回调
+        maxLength: 255
+        type: string
+      stream:
+        description: 流的唯一标识
+        type: string
+    required:
+    - startCallback
+    - stopCallback
+    - stream
+    type: object
   weekplans.patchReq:
     properties:
       enable:
@@ -316,10 +334,6 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/internal.Error'
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden
         "500":
           description: Internal Server Error
           schema:
@@ -383,6 +397,73 @@ paths:
           schema:
             $ref: '#/definitions/internal.Error'
       summary: 修改
+      tags:
+      - 周计划
+  /week_plans/{id}/streams:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: WeekPlan.ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 流标识数组
+        in: body
+        name: data
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal.Error'
+      summary: 解绑流
+      tags:
+      - 周计划
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: WeekPlan.ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 流标识数组
+        in: body
+        name: data
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/streams.stream'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal.IDResult-int64'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal.Error'
+      summary: 关联流
       tags:
       - 周计划
 swagger: "2.0"

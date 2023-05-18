@@ -23,16 +23,16 @@ type patchReq struct {
 	Peroids [][]*db.TimePeroid `json:"peroids" binding:"omitempty,min=1,max=7,dive,required,min=1,dive"`
 }
 
-// @Summary	修改
-// @Tags		周计划
-// @Param		id		path	string		true	"WeekPlan.ID"
-// @Param		data	body	patchReq	true	"数据"
-// @Accept		json
-// @Produce	json
-// @Success	201	{object}	internal.RowResult
-// @Failure	400	{object}	internal.Error
-// @Failure	500	{object}	internal.Error
-// @Router		/week_plans/{id} [patch]
+//	@Summary	修改
+//	@Tags		周计划
+//	@Param		id		path	string		true	"WeekPlan.ID"
+//	@Param		data	body	patchReq	true	"数据"
+//	@Accept		json
+//	@Produce	json
+//	@Success	201	{object}	internal.RowResult
+//	@Failure	400	{object}	internal.Error
+//	@Failure	500	{object}	internal.Error
+//	@Router		/week_plans/{id} [patch]
 func patch(ctx *gin.Context) {
 	// 参数
 	var id internal.IDPath[string]

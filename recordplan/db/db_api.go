@@ -106,26 +106,6 @@ func List[M any](query Query, page *Page, res *ListData[M]) error {
 	return nil
 }
 
-type timeQuery struct {
-	// 创建时间戳，精确匹配
-	CreatedAt *int64 `form:"createdAt" binding:"omitempty,min=0"`
-	// 更新时间戳，精确匹配
-	UpdatedAt *int64 `form:"updatedAt" binding:"omitempty,min=0"`
-}
-
-// Init 实现 Query 接口
-func (q *timeQuery) Init(db *gorm.DB) *gorm.DB {
-	// 创建时间戳
-	if q.CreatedAt != nil {
-		db = db.Where("`CreatedAt` = ?", *q.CreatedAt)
-	}
-	// 更新时间戳
-	if q.UpdatedAt != nil {
-		db = db.Where("`UpdatedAt` = ?", *q.UpdatedAt)
-	}
-	return db
-}
-
 // TimeRangeQuery 用于时间范围查询
 type TimeRangeQuery struct {
 	// 创建时间，时间戳，范围匹配，CreatedAt >= CreatedAtAfter
