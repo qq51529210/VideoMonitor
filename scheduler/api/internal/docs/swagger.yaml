@@ -66,8 +66,11 @@ definitions:
         description: 行数
         type: integer
     type: object
-  streams.stream:
+  tasks.tasks:
     properties:
+      id:
+        description: 流的唯一标识
+        type: string
       startCallback:
         description: 开始录像回调
         maxLength: 255
@@ -76,13 +79,10 @@ definitions:
         description: 停止录像回调
         maxLength: 255
         type: string
-      stream:
-        description: 流的唯一标识
-        type: string
     required:
+    - id
     - startCallback
     - stopCallback
-    - stream
     type: object
   weekplans.patchReq:
     properties:
@@ -376,7 +376,7 @@ paths:
         name: id
         required: true
         type: string
-      - description: 流标识数组
+      - description: 自定义的任务 ID 数组
         in: body
         name: data
         required: true
@@ -407,13 +407,13 @@ paths:
         name: id
         required: true
         type: string
-      - description: 流标识数组
+      - description: 任务数组
         in: body
         name: data
         required: true
         schema:
           items:
-            $ref: '#/definitions/streams.stream'
+            $ref: '#/definitions/tasks.tasks'
           type: array
       produces:
       - application/json
@@ -430,7 +430,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/internal.Error'
-      summary: 关联流
+      summary: 绑定任务
       tags:
       - 周计划
 swagger: "2.0"

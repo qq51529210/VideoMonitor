@@ -2,7 +2,7 @@ package internal
 
 import (
 	"fmt"
-	"recordplan/db"
+	"scheduler/db"
 	"time"
 
 	"github.com/gin-gonic/gin/binding"

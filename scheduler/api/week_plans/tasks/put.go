@@ -1,19 +1,18 @@
-package streams
+package tasks
 
 import (
 	"net/http"
-	"recordplan/api/internal"
-	"recordplan/db"
-	"recordplan/week"
+	"scheduler/api/internal"
+	"scheduler/db"
+	"scheduler/week"
 
 	"github.com/gin-gonic/gin"
-	"github.com/qq51529210/util"
 )
 
-//	@Summary	关联流
+//	@Summary	绑定任务
 //	@Tags		周计划
-//	@Param		id		path	string		true	"WeekPlan.ID"
-//	@Param		data	body	[]stream	true	"流标识数组"
+//	@Param		id		path	string	true	"WeekPlan.ID"
+//	@Param		data	body	[]tasks	true	"任务数组"
 //	@Accept		json
 //	@Produce	json
 //	@Success	201	{object}	internal.IDResult[int64]
@@ -28,22 +27,24 @@ func put(ctx *gin.Context) {
 		internal.Handle400(ctx, err)
 		return
 	}
-	var req []*stream
+	var req []*tasks
 	err = ctx.ShouldBindJSON(&req)
 	if err != nil {
 		internal.Handle400(ctx, err)
 		return
 	}
 	// 数据
-	var models []*db.WeekPlanStream
+	var models []*db.WeekPlanTask
 	for _, r := range req {
-		model := new(db.WeekPlanStream)
-		util.CopyStruct(model, r)
+		model := new(db.WeekPlanTask)
 		model.WeekPlanID = weekplanID.ID
+		model.TaskID = r.ID
+		model.StartCallback = r.StartCallback
+		model.StopCallback = r.StopCallback
 		models = append(models, model)
 	}
 	// 添加
-	rows, err := db.BatchAddWeekPlanStream(models)
+	rows, err := db.BatchAddWeekPlanTask(models)
 	if err != nil {
 		internal.HandleDB500(ctx, err)
 		return

@@ -1,10 +1,10 @@
-package streams
+package tasks
 
 import (
 	"net/http"
-	"recordplan/api/internal"
-	"recordplan/db"
-	"recordplan/week"
+	"scheduler/api/internal"
+	"scheduler/db"
+	"scheduler/week"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,7 +12,7 @@ import (
 //	@Summary	解绑流
 //	@Tags		周计划
 //	@Param		id		path	string		true	"WeekPlan.ID"
-//	@Param		data	body	[]string	true	"流标识数组"
+//	@Param		data	body	[]string	true	"自定义的任务 ID 数组"
 //	@Accept		json
 //	@Success	204
 //	@Failure	400	{object}	internal.Error
@@ -33,13 +33,13 @@ func delete(ctx *gin.Context) {
 		return
 	}
 	// 数据
-	keys := make([]db.WeekPlanStreamKey, len(req))
+	keys := make([]db.WeekPlanTaskKey, len(req))
 	for i := 0; i < len(keys); i++ {
 		keys[i].WeekPlanID = weekplanID.ID
-		keys[i].Stream = req[i]
+		keys[i].TaskID = req[i]
 	}
 	// 删除
-	rows, err := db.BatchDeleteWeekPlanStream(keys)
+	rows, err := db.BatchDeleteWeekPlanTask(keys)
 	if err != nil {
 		internal.HandleDB500(ctx, err)
 		return

@@ -2,9 +2,9 @@ package weekplans
 
 import (
 	"net/http"
-	"recordplan/api/internal"
-	"recordplan/db"
-	"recordplan/week"
+	"scheduler/api/internal"
+	"scheduler/db"
+	"scheduler/week"
 
 	"github.com/gin-gonic/gin"
 )

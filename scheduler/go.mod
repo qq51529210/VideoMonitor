@@ -1,4 +1,4 @@
-module recordplan
+module scheduler
 
 go 1.20
 

@@ -2,8 +2,8 @@ package week
 
 import (
 	"net/http"
-	"recordplan/db"
 	"runtime"
+	"scheduler/db"
 	"sync"
 	"time"
 
@@ -16,7 +16,6 @@ var (
 )
 
 func init() {
-	_checker.stream = make(map[string]int)
 	_checker.weekplan = make(map[string]*weekplan)
 }
 
@@ -26,9 +25,6 @@ type checker struct {
 	sync.RWMutex
 	// 所有的录像计划，key: db.WeekPlan.ID
 	weekplan map[string]*weekplan
-	// 需要录像流，方便查询
-	// key: db.WeekPlanStream.Stream
-	stream map[string]int
 	// 检查周期
 	checkInterval time.Duration
 	// 并发数
@@ -57,10 +53,10 @@ func (c *checker) init(checkInterval, concurrency, apiTimeout int) error {
 		return err
 	}
 	// 加载
-	c.stream = make(map[string]int)
 	c.weekplan = make(map[string]*weekplan)
 	for _, model := range models {
 		p := new(weekplan)
+		p.init(model)
 		c.weekplan[model.ID] = p
 	}
 	// 启动
@@ -140,6 +136,8 @@ func (c *checker) concurrencyCheckRoutine(now *time.Time, wps []*weekplan) {
 		}
 		wp.isRecording = needRecord
 		// 需要录像，调用回调
+		// todo 考虑一下，是否需要判断回调成功后停止
+		// 如果这样，对方系统在这段时间出问题，就不能再触发或者停止任务了
 		if wp.isRecording {
 			c.startCallback(wp)
 		} else {
@@ -148,10 +146,10 @@ func (c *checker) concurrencyCheckRoutine(now *time.Time, wps []*weekplan) {
 	}
 }
 
-// startCallback 调用 id 关联的所有 stream 的 StartCallback
+// startCallback 调用 id 关联的所有 task 的 StartCallback
 func (c *checker) startCallback(wp *weekplan) {
-	for _, stream := range wp.AllStream() {
-		err := util.HTTP[int, int](http.MethodGet, *stream.StartCallback, nil, nil, nil, http.StatusOK, c.apiCallTimeout)
+	for _, task := range wp.allTask() {
+		err := util.HTTP[int, int](http.MethodGet, *task.StartCallback, nil, nil, nil, http.StatusOK, c.apiCallTimeout)
 		if err != nil {
 			if code, ok := err.(util.HTTPStatusError); ok {
 				// 没有这个流了，移除
@@ -159,15 +157,15 @@ func (c *checker) startCallback(wp *weekplan) {
 					continue
 				}
 			}
-			log.Errorf("week plan %s start callback stream %s error: %s", wp.id, stream.Stream, err.Error())
+			log.Errorf("week plan %s start callback task %s error: %s", wp.id, task.TaskID, err.Error())
 		}
 	}
 }
 
-// stopCallback 调用 id 关联的所有 stream 的 StartCallback
+// stopCallback 调用 id 关联的所有 task 的 StartCallback
 func (c *checker) stopCallback(wp *weekplan) {
-	for _, stream := range wp.AllStream() {
-		err := util.HTTP[int, int](http.MethodGet, *stream.StopCallback, nil, nil, nil, http.StatusOK, c.apiCallTimeout)
+	for _, task := range wp.allTask() {
+		err := util.HTTP[int, int](http.MethodGet, *task.StopCallback, nil, nil, nil, http.StatusOK, c.apiCallTimeout)
 		if err != nil {
 			if code, ok := err.(util.HTTPStatusError); ok {
 				// 没有这个流了，移除
@@ -175,7 +173,7 @@ func (c *checker) stopCallback(wp *weekplan) {
 					continue
 				}
 			}
-			log.Errorf("week plan %s stop callback stream %s error: %s", wp.id, stream.Stream, err.Error())
+			log.Errorf("week plan %s stop callback task %s error: %s", wp.id, task.TaskID, err.Error())
 		}
 	}
 }
@@ -218,10 +216,12 @@ func (c *checker) add(model *db.WeekPlan) {
 	c.Lock()
 	// 比较数据版本
 	p := c.weekplan[model.ID]
-	// 新加载的数据，比内存的旧
-	if p.version > model.Version {
-		c.Unlock()
-		return
+	if p != nil {
+		// 新加载的数据，比内存的旧
+		if p.version > model.Version {
+			c.Unlock()
+			return
+		}
 	}
 	// 比内存的新，替换
 	p = new(weekplan)

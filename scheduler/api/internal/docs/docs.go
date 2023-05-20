@@ -352,7 +352,7 @@ const docTemplate = `{
                 "tags": [
                     "周计划"
                 ],
-                "summary": "关联流",
+                "summary": "绑定任务",
                 "parameters": [
                     {
                         "type": "string",
@@ -362,14 +362,14 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "流标识数组",
+                        "description": "任务数组",
                         "name": "data",
                         "in": "body",
                         "required": true,
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/streams.stream"
+                                "$ref": "#/definitions/tasks.tasks"
                             }
                         }
                     }
@@ -412,7 +412,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "流标识数组",
+                        "description": "自定义的任务 ID 数组",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -537,14 +537,18 @@ const docTemplate = `{
                 }
             }
         },
-        "streams.stream": {
+        "tasks.tasks": {
             "type": "object",
             "required": [
+                "id",
                 "startCallback",
-                "stopCallback",
-                "stream"
+                "stopCallback"
             ],
             "properties": {
+                "id": {
+                    "description": "流的唯一标识",
+                    "type": "string"
+                },
                 "startCallback": {
                     "description": "开始录像回调",
                     "type": "string",
@@ -554,10 +558,6 @@ const docTemplate = `{
                     "description": "停止录像回调",
                     "type": "string",
                     "maxLength": 255
-                },
-                "stream": {
-                    "description": "流的唯一标识",
-                    "type": "string"
                 }
             }
         },

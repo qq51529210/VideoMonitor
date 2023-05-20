@@ -1,9 +1,9 @@
 package main
 
 import (
-	"recordplan/api"
-	"recordplan/db"
-	"recordplan/week"
+	"scheduler/api"
+	"scheduler/db"
+	"scheduler/week"
 
 	"github.com/qq51529210/log"
 )

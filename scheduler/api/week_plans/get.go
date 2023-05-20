@@ -3,8 +3,8 @@ package weekplans
 import (
 	"net/http"
 
-	"recordplan/api/internal"
-	"recordplan/db"
+	"scheduler/api/internal"
+	"scheduler/db"
 
 	"github.com/gin-gonic/gin"
 )

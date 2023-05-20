@@ -9,8 +9,9 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	"recordplan/api/internal/docs"
-	weekplans "recordplan/api/week_plans"
+	"scheduler/api/callbacks"
+	"scheduler/api/internal/docs"
+	weekplans "scheduler/api/week_plans"
 
 	"github.com/gin-gonic/gin"
 )
@@ -41,7 +42,8 @@ func (s *server) Serve(port int) {
 
 // initRouter 初始化路由
 func (s *server) initRouter() {
-	gin.SetMode(gin.ReleaseMode)
+	// gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(gin.DebugMode)
 	s.gin = gin.New()
 	s.ser.Handler = s.gin
 	// 文档
@@ -54,6 +56,7 @@ func (s *server) initRouter() {
 	s.gin.Use(global)
 	// 路由
 	weekplans.Init(s.gin)
+	callbacks.Init(s.gin)
 }
 
 // 全局第一个中间件
