@@ -6,6 +6,10 @@ import (
 	"gorm.io/gorm"
 )
 
+var (
+	enableCache bool
+)
+
 // mapCache 用于缓存数据
 type mapCache[K comparable, M any] struct {
 	sync.Mutex
@@ -41,6 +45,10 @@ func newMapCache[K comparable, M any](
 
 // check 检查内存数据是否需要重新加载
 func (c *mapCache[K, M]) check() error {
+	// 没有缓存
+	if !enableCache {
+		return nil
+	}
 	// 看看标记是否有效
 	if !c.ok {
 		// 加载
@@ -51,6 +59,10 @@ func (c *mapCache[K, M]) check() error {
 
 // load 尝试加载，添加和修改时候调用
 func (c *mapCache[K, M]) load(k K) error {
+	// 没有缓存
+	if !enableCache {
+		return nil
+	}
 	// 读取
 	m := c.new()
 	err := c.whereKey(_db, k).First(m).Error
@@ -70,6 +82,10 @@ func (c *mapCache[K, M]) load(k K) error {
 }
 
 func (c *mapCache[K, M]) loadAll() error {
+	// 没有缓存
+	if !enableCache {
+		return nil
+	}
 	var models []M
 	// 数据库
 	err := _db.Find(&models).Error
@@ -90,6 +106,10 @@ func (c *mapCache[K, M]) loadAll() error {
 
 // Load 尝试加载，添加和修改时候调用
 func (c *mapCache[K, M]) Load(k K) {
+	// 没有缓存
+	if !enableCache {
+		return
+	}
 	// 上锁
 	c.Lock()
 	defer c.Unlock()
@@ -99,6 +119,15 @@ func (c *mapCache[K, M]) Load(k K) {
 
 // All 返回所有
 func (c *mapCache[K, M]) All() ([]M, error) {
+	// 没有缓存
+	if !enableCache {
+		var models []M
+		err := _db.Find(&models).Error
+		if err != nil {
+			return nil, err
+		}
+		return models, nil
+	}
 	// 上锁
 	c.Lock()
 	defer c.Unlock()
@@ -118,6 +147,15 @@ func (c *mapCache[K, M]) All() ([]M, error) {
 
 // Get 返回
 func (c *mapCache[K, M]) Get(k K) (m M, err error) {
+	// 没有缓存
+	if !enableCache {
+		mm := c.new()
+		if err = c.whereKey(_db, k).First(mm).Error; err != nil {
+			return
+		}
+		m = mm
+		return
+	}
 	// 上锁
 	c.Lock()
 	defer c.Unlock()
@@ -140,7 +178,7 @@ func (c *mapCache[K, M]) Add(m M) (int64, error) {
 		return db.RowsAffected, db.Error
 	}
 	// 内存
-	if db.RowsAffected > 0 {
+	if enableCache && db.RowsAffected > 0 {
 		// 上锁
 		c.Lock()
 		defer c.Unlock()
@@ -160,7 +198,7 @@ func (c *mapCache[K, M]) Update(m M) (int64, error) {
 		return db.RowsAffected, db.Error
 	}
 	// 内存
-	if db.RowsAffected > 0 {
+	if enableCache && db.RowsAffected > 0 {
 		// 上锁
 		c.Lock()
 		defer c.Unlock()
@@ -180,7 +218,7 @@ func (c *mapCache[K, M]) Save(m M) (int64, error) {
 		return db.RowsAffected, db.Error
 	}
 	// 内存
-	if db.RowsAffected > 0 {
+	if enableCache && db.RowsAffected > 0 {
 		// 上锁
 		c.Lock()
 		defer c.Unlock()
@@ -198,7 +236,7 @@ func (c *mapCache[K, M]) Delete(k K) (int64, error) {
 		return db.RowsAffected, db.Error
 	}
 	// 内存
-	if db.RowsAffected > 0 {
+	if enableCache && db.RowsAffected > 0 {
 		// 上锁
 		c.Lock()
 		defer c.Unlock()
@@ -217,7 +255,7 @@ func (c *mapCache[K, M]) BatchDelete(ks []K) (int64, error) {
 		return db.RowsAffected, db.Error
 	}
 	// 内存
-	if db.RowsAffected > 0 {
+	if enableCache && db.RowsAffected > 0 {
 		// 上锁
 		c.Lock()
 		defer c.Unlock()

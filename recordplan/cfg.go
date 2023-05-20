@@ -13,11 +13,24 @@ var (
 
 // cfgLog 日志的配置
 type cfgLog struct {
+	// 日志保存的根目录
+	Dir string `json:"dir" yaml:"dir" validate:"required,path"`
+	// 每一份日志文件的最大字节，使用 1.5/K/M/G/T 这样的字符表示。
+	MaxFileSize string `json:"maxFileSize" yaml:"maxFileSize"`
+	// 保存的最大天数，最小是1天。
+	MaxKeepDay float64 `json:"maxKeepDay" yaml:"maxKeepDay"`
+	// 同步到磁盘的时间间隔，单位，毫秒。最小是10毫秒。
+	SyncInterval int `json:"syncInterval" yaml:"syncInterval" validate:"required,min=1"`
+	// 是否输出到控制台，out/err
+	Std string `json:"std" yaml:"std" validate:"omitempty,oneof=out err"`
+	// 禁用的日志级别
+	DisableLevel []string `json:"disableLevel" yaml:"disableLevel" validate:"omitempty,dive,oneof=out err"`
 }
 
 // cfgDB 数据库的配置
 type cfgDB struct {
-	URL string `json:"url" yaml:"url"`
+	URL         string `json:"url" yaml:"url"`
+	EnableCache bool   `json:"enableCache" yaml:"enableCache"`
 }
 
 // cfgWeekPlan 周计划的配置

@@ -1,8 +1,15 @@
 name: record-plan-service-1
 port: 8001
 log:
+ dir: log
+ maxFileSize: 10M
+ maxKeepDay: 2.5
+ syncInterval: 1000
+ std: out
+ disableLevel:
 db:
  url: root:1231@tcp(127.0.0.1:3306)/recordplan?charset=utf8mb4
+ enableCache: true
 weekPlan:
  checkInterval: 10
  concurrency: 1

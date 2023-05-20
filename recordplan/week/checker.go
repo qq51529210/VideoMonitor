@@ -158,6 +158,9 @@ func (c *checker) startCallback(id string) {
 	}
 	// 回调
 	for _, model := range models {
+		if model.StartCallback == nil {
+			continue
+		}
 		err := util.HTTP[int, int](http.MethodGet, *model.StartCallback, nil, nil, nil, http.StatusOK, c.apiCallTimeout)
 		if err != nil {
 			log.Errorf("week plan %s start callback stream %s error: %s", id, model.Stream, err.Error())
@@ -175,6 +178,9 @@ func (c *checker) stopCallback(id string) {
 	}
 	// 回调
 	for _, model := range models {
+		if model.StopCallback == nil {
+			continue
+		}
 		err := util.HTTP[int, int](http.MethodGet, *model.StopCallback, nil, nil, nil, http.StatusOK, c.apiCallTimeout)
 		if err != nil {
 			log.Errorf("week plan %s stop callback stream %s error: %s", id, model.Stream, err.Error())

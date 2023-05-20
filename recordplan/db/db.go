@@ -22,7 +22,7 @@ var (
 )
 
 // Init 初始化数据
-func Init(uri string) error {
+func Init(uri string, cache bool) error {
 	// 连接
 	err := initDB(uri)
 	if err != nil {
@@ -38,6 +38,8 @@ func Init(uri string) error {
 	if err != nil {
 		return err
 	}
+	//
+	enableCache = cache
 	//
 	return nil
 }
@@ -80,7 +82,6 @@ func createMysqlSchema(uri string) error {
 // initTable 创建表
 func initTable() error {
 	return _db.AutoMigrate(
-		&AppConfig{},
 		&WeekPlan{},
 		&WeekPlanStream{},
 	)
@@ -88,9 +89,5 @@ func initTable() error {
 
 // initData 写入默认数据
 func initData() error {
-	err := initAppConfig()
-	if err != nil {
-		return err
-	}
 	return nil
 }

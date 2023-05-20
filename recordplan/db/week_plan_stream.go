@@ -41,7 +41,7 @@ func BatchAddWeekPlanStream(models []*WeekPlanStream) (int64, error) {
 		return rows, err
 	}
 	// 缓存
-	if *AppCfg.EnableCache == 1 {
+	if enableCache {
 		// 上锁
 		weekPlanStreamCache.Lock()
 		defer weekPlanStreamCache.Unlock()
