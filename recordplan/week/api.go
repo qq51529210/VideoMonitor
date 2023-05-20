@@ -18,16 +18,6 @@ func Reload(id string) {
 	go _checker.loadRoutine(id)
 }
 
-// Remove 移除内存，在删除数据库后调用
-func Remove(id string) {
-	_checker.remove(id)
-}
-
-// BatcRemove 批量移除内存，在删除数据库后调用
-func BatcRemove(ids []string) {
-	_checker.batchRemove(ids)
-}
-
 // IsRecording 返回指定 id 的录像是否在录像时间段。
 // 再查询出关联的 stream ，就可以知道 stream 是否需要录像。
 // 如果 id 不存在，返回 ErrNotFound

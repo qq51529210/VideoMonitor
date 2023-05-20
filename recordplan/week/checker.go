@@ -209,6 +209,9 @@ func (c *checker) loadRoutine(id string) {
 		}
 		// 不存在
 		if weekPlanModel == nil {
+			c.Lock()
+			delete(c.weekplan, id)
+			c.Unlock()
 			return
 		}
 		// 成功
@@ -234,20 +237,4 @@ func (c *checker) add(model *db.WeekPlan) {
 	c.Unlock()
 	// 初始化
 	p.init(model)
-}
-
-// remove 移除数据，id 不存在略过
-func (c *checker) remove(id string) {
-	c.Lock()
-	delete(c.weekplan, id)
-	c.Unlock()
-}
-
-// batchRemove 批量移除数据，id 不存在略过
-func (c *checker) batchRemove(ids []string) {
-	c.Lock()
-	for _, id := range ids {
-		delete(c.weekplan, id)
-	}
-	c.Unlock()
 }

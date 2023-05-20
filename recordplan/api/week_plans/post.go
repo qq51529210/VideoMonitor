@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"recordplan/api/internal"
 	"recordplan/db"
+	"recordplan/week"
 
 	"github.com/gin-gonic/gin"
 	"github.com/qq51529210/util"
@@ -45,10 +46,14 @@ func post(ctx *gin.Context) {
 	util.CopyStruct(&model, &req)
 	model.ID = uuid.LowerV1WithoutHyphen()
 	model.Peroids = jsonTimePeroid(req.Peroids)
-	_, err = db.AddWeekPlan(&model)
+	row, err := db.AddWeekPlan(&model)
 	if err != nil {
 		internal.HandleDB500(ctx, err)
 		return
+	}
+	// 更新
+	if row > 0 {
+		week.Reload(model.ID)
 	}
 	// 返回
 	ctx.JSON(http.StatusCreated, &internal.IDResult[string]{

@@ -5,6 +5,7 @@ import (
 
 	"recordplan/api/internal"
 	"recordplan/db"
+	"recordplan/week"
 
 	"github.com/gin-gonic/gin"
 	"github.com/qq51529210/util"
@@ -66,6 +67,10 @@ func patch(ctx *gin.Context) {
 	if err != nil {
 		internal.HandleDB500(ctx, err)
 		return
+	}
+	// 更新
+	if rows > 0 {
+		week.Reload(model.ID)
 	}
 	// 返回
 	ctx.JSON(http.StatusCreated, &internal.RowResult{
