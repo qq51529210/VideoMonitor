@@ -12,7 +12,8 @@ import (
 //	@version	1.0.0
 func main() {
 	defer func() {
-		log.Recover(recover())
+		log.Recover(nil)
+		// log.Recover(recover())
 	}()
 	// 配置
 	err := loadCfg()

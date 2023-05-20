@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"recordplan/db"
 	"time"
+
+	"github.com/qq51529210/log"
 )
 
 type peroid struct {
@@ -14,18 +16,44 @@ type peroid struct {
 	End time.Time
 }
 
+// weekplan 表示计划
 type weekplan struct {
 	// db.WeekPlan.ID
-	ID string
-	// JSON.Decode(db.WeekPlan.Peroids)
-	Peroids [][]*peroid
+	id string
 	// 数据库版本
-	Version int64
+	version int64
+	// JSON.Decode(db.WeekPlan.Peroids)
+	peroids [][]*peroid
 	// 是否在录像时间
-	IsRecording bool
+	isRecording bool
+	// 关联的流
+	stream []*db.WeekPlanStream
+	// stream 数据是否有效
+	streamOK bool
 }
 
 func (p *weekplan) init(model *db.WeekPlan) {
-	p.ID = model.ID
-	json.NewDecoder(bytes.NewBufferString(*model.Peroids)).Decode(&p.Peroids)
+	p.id = model.ID
+	p.version = model.Version
+	json.NewDecoder(bytes.NewBufferString(*model.Peroids)).Decode(&p.peroids)
+	p.initStream()
+}
+
+func (p *weekplan) initStream() {
+	// 查询
+	models, err := db.GetWeekPlanStreamListByPlanID(p.id)
+	if err != nil {
+		log.ErrorfDepth(1, "load week plan %s stream error: %s", p.id, err.Error())
+	}
+	// 加载
+	p.stream = models
+	p.streamOK = true
+}
+
+func (p *weekplan) AllStream() []*db.WeekPlanStream {
+	// 数据不正常，加载
+	if !p.streamOK {
+		p.initStream()
+	}
+	return p.stream
 }

@@ -123,12 +123,12 @@ func (c *checker) concurrencyCheckRoutine(now *time.Time, wps []*weekplan) {
 	peroid := time.Date(0, 1, 1, now.Hour(), now.Minute(), now.Second(), 0, now.Location())
 	for _, wp := range wps {
 		// 超过了时间
-		if weekDay >= len(wp.Peroids) {
+		if weekDay >= len(wp.peroids) {
 			continue
 		}
 		// 是否需要录像
 		needRecord := false
-		for _, p := range wp.Peroids[weekDay] {
+		for _, p := range wp.peroids[weekDay] {
 			// 当前时间在时间段内
 			if peroid.After(p.Start) && peroid.Before(p.End) {
 				needRecord = true
@@ -138,52 +138,44 @@ func (c *checker) concurrencyCheckRoutine(now *time.Time, wps []*weekplan) {
 				break
 			}
 		}
-		wp.IsRecording = needRecord
+		wp.isRecording = needRecord
 		// 需要录像，调用回调
-		if wp.IsRecording {
-			c.startCallback(wp.ID)
+		if wp.isRecording {
+			c.startCallback(wp)
 		} else {
-			c.stopCallback(wp.ID)
+			c.stopCallback(wp)
 		}
 	}
 }
 
 // startCallback 调用 id 关联的所有 stream 的 StartCallback
-func (c *checker) startCallback(id string) {
-	// 数据库
-	models, err := db.GetWeekPlanStreamListByPlanID(id)
-	if err != nil {
-		log.Errorf("week plan %s start callback get db stream list error: %s", id, err.Error())
-		return
-	}
-	// 回调
-	for _, model := range models {
-		if model.StartCallback == nil {
-			continue
-		}
-		err := util.HTTP[int, int](http.MethodGet, *model.StartCallback, nil, nil, nil, http.StatusOK, c.apiCallTimeout)
+func (c *checker) startCallback(wp *weekplan) {
+	for _, stream := range wp.AllStream() {
+		err := util.HTTP[int, int](http.MethodGet, *stream.StartCallback, nil, nil, nil, http.StatusOK, c.apiCallTimeout)
 		if err != nil {
-			log.Errorf("week plan %s start callback stream %s error: %s", id, model.Stream, err.Error())
+			if code, ok := err.(util.HTTPStatusError); ok {
+				// 没有这个流了，移除
+				if code == http.StatusNotFound {
+					continue
+				}
+			}
+			log.Errorf("week plan %s start callback stream %s error: %s", wp.id, stream.Stream, err.Error())
 		}
 	}
 }
 
 // stopCallback 调用 id 关联的所有 stream 的 StartCallback
-func (c *checker) stopCallback(id string) {
-	// 数据库
-	models, err := db.GetWeekPlanStreamListByPlanID(id)
-	if err != nil {
-		log.Errorf("week plan %s stop callback get db stream list error: %s", id, err.Error())
-		return
-	}
-	// 回调
-	for _, model := range models {
-		if model.StopCallback == nil {
-			continue
-		}
-		err := util.HTTP[int, int](http.MethodGet, *model.StopCallback, nil, nil, nil, http.StatusOK, c.apiCallTimeout)
+func (c *checker) stopCallback(wp *weekplan) {
+	for _, stream := range wp.AllStream() {
+		err := util.HTTP[int, int](http.MethodGet, *stream.StopCallback, nil, nil, nil, http.StatusOK, c.apiCallTimeout)
 		if err != nil {
-			log.Errorf("week plan %s stop callback stream %s error: %s", id, model.Stream, err.Error())
+			if code, ok := err.(util.HTTPStatusError); ok {
+				// 没有这个流了，移除
+				if code == http.StatusNotFound {
+					continue
+				}
+			}
+			log.Errorf("week plan %s stop callback stream %s error: %s", wp.id, stream.Stream, err.Error())
 		}
 	}
 }
@@ -207,8 +199,8 @@ func (c *checker) loadRoutine(id string) {
 			time.Sleep(time.Second)
 			continue
 		}
-		// 不存在
-		if weekPlanModel == nil {
+		// 不存在，或者禁用
+		if weekPlanModel == nil || *weekPlanModel.Enable != 1 {
 			c.Lock()
 			delete(c.weekplan, id)
 			c.Unlock()
@@ -227,7 +219,7 @@ func (c *checker) add(model *db.WeekPlan) {
 	// 比较数据版本
 	p := c.weekplan[model.ID]
 	// 新加载的数据，比内存的旧
-	if p.Version > model.UpdatedAt {
+	if p.version > model.Version {
 		c.Unlock()
 		return
 	}

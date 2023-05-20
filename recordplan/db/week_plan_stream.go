@@ -86,12 +86,12 @@ type WeekPlanStreamKey struct {
 type WeekPlanStream struct {
 	WeekPlanStreamKey
 	WeekPlan *WeekPlan `json:"-" gorm:"foreignKey:WeekPlanID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	// 用于版本控制
+	Version int64 `json:"-" gorm:"autoUpdateTime:nano"`
 	// 开始录像的回调，Get 方法
 	StartCallback *string `json:"startCallback" gorm:"type:varchar(512)"`
 	// 停止录像的回调，Get 方法
 	StopCallback *string `json:"stopCallback" gorm:"type:varchar(512)"`
-	// 用于版本控制
-	Version int64 `gorm:"autoUpdateTime:nano"`
 }
 
 // WeekPlanStreamQuery 是 WeekPlanStream 的查询参数

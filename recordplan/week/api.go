@@ -12,7 +12,7 @@ func Run(checkInterval, concurrency, apiTimeout int) error {
 	return _checker.init(checkInterval, concurrency, apiTimeout)
 }
 
-// Reload 加载内存，在添加和修改数据库后调用
+// Reload 重新加载，在添加和修改数据库后调用
 func Reload(id string) {
 	_checker.Add(1)
 	go _checker.loadRoutine(id)
@@ -28,5 +28,5 @@ func IsRecording(id string) (bool, error) {
 	if plan == nil {
 		return false, ErrNotFound
 	}
-	return plan.IsRecording, nil
+	return plan.isRecording, nil
 }

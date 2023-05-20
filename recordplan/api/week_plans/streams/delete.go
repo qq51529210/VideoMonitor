@@ -4,12 +4,10 @@ import (
 	"net/http"
 	"recordplan/api/internal"
 	"recordplan/db"
+	"recordplan/week"
 
 	"github.com/gin-gonic/gin"
 )
-
-type putReq struct {
-}
 
 //	@Summary	解绑流
 //	@Tags		周计划
@@ -41,10 +39,14 @@ func delete(ctx *gin.Context) {
 		keys[i].Stream = req[i]
 	}
 	// 删除
-	_, err = db.BatchDeleteWeekPlanStream(keys)
+	rows, err := db.BatchDeleteWeekPlanStream(keys)
 	if err != nil {
 		internal.HandleDB500(ctx, err)
 		return
+	}
+	// 更新
+	if rows > 0 {
+		week.Reload(weekplanID.ID)
 	}
 	// 返回
 	ctx.Status(http.StatusNoContent)

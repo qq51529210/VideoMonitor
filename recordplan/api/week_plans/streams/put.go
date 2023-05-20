@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"recordplan/api/internal"
 	"recordplan/db"
+	"recordplan/week"
 
 	"github.com/gin-gonic/gin"
 	"github.com/qq51529210/util"
@@ -46,6 +47,10 @@ func put(ctx *gin.Context) {
 	if err != nil {
 		internal.HandleDB500(ctx, err)
 		return
+	}
+	// 更新
+	if rows > 0 {
+		week.Reload(weekplanID.ID)
 	}
 	// 返回
 	ctx.JSON(http.StatusCreated, &internal.RowResult{

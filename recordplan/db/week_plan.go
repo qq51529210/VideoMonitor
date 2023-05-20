@@ -47,6 +47,8 @@ type TimePeroid struct {
 // WeekPlan 表示周计划
 type WeekPlan struct {
 	BaseModel
+	// 用于版本控制
+	Version int64 `json:"-" gorm:"autoUpdateTime:nano"`
 	// 名称
 	Name *string `json:"name" gorm:"type:varchar(32);not null"`
 	// 是否禁用
