@@ -366,7 +366,7 @@ paths:
       summary: 修改
       tags:
       - 周计划
-  /week_plans/{id}/streams:
+  /week_plans/{id}/tasks:
     delete:
       consumes:
       - application/json
@@ -395,7 +395,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/internal.Error'
-      summary: 解绑流
+      summary: 删除任务
       tags:
       - 周计划
     put:
@@ -430,7 +430,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/internal.Error'
-      summary: 绑定任务
+      summary: 添加任务
       tags:
       - 周计划
 swagger: "2.0"

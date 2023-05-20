@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//	@Summary	绑定任务
+//	@Summary	添加任务
 //	@Tags		周计划
 //	@Param		id		path	string	true	"WeekPlan.ID"
 //	@Param		data	body	[]tasks	true	"任务数组"
@@ -18,7 +18,7 @@ import (
 //	@Success	201	{object}	internal.IDResult[int64]
 //	@Failure	400	{object}	internal.Error
 //	@Failure	500	{object}	internal.Error
-//	@Router		/week_plans/{id}/streams [put]
+//	@Router		/week_plans/{id}/tasks [put]
 func put(ctx *gin.Context) {
 	// 参数
 	var weekplanID internal.IDPath[string]

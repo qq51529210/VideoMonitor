@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//	@Summary	解绑流
+//	@Summary	删除任务
 //	@Tags		周计划
 //	@Param		id		path	string		true	"WeekPlan.ID"
 //	@Param		data	body	[]string	true	"自定义的任务 ID 数组"
@@ -17,7 +17,7 @@ import (
 //	@Success	204
 //	@Failure	400	{object}	internal.Error
 //	@Failure	500	{object}	internal.Error
-//	@Router		/week_plans/{id}/streams [delete]
+//	@Router		/week_plans/{id}/tasks [delete]
 func delete(ctx *gin.Context) {
 	// 参数
 	var weekplanID internal.IDPath[string]

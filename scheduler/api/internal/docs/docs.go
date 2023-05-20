@@ -341,7 +341,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/week_plans/{id}/streams": {
+        "/week_plans/{id}/tasks": {
             "put": {
                 "consumes": [
                     "application/json"
@@ -352,7 +352,7 @@ const docTemplate = `{
                 "tags": [
                     "周计划"
                 ],
-                "summary": "绑定任务",
+                "summary": "添加任务",
                 "parameters": [
                     {
                         "type": "string",
@@ -402,7 +402,7 @@ const docTemplate = `{
                 "tags": [
                     "周计划"
                 ],
-                "summary": "解绑流",
+                "summary": "删除任务",
                 "parameters": [
                     {
                         "type": "string",
