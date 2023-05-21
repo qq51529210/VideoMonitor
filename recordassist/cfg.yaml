@@ -1,5 +1,5 @@
-name: record-plan-service-1
-port: 8001
+name: record-assist-service-1
+port: 8002
 log:
  dir: log
  maxFileSize: 10M
@@ -7,10 +7,11 @@ log:
  syncInterval: 1000
  std: out
  disableLevel:
-db:
- url: root:1231@tcp(127.0.0.1:3306)/recordplan?charset=utf8mb4
- enableCache: true
-weekPlan:
+check:
+ dir: ./record
  checkInterval: 3
- concurrency: 1
  apiCallTimeout: 3
+ maxDuration: 600
+db:
+ url: root:1231@tcp(127.0.0.1:3306)/recordassist?charset=utf8mb4
+ enableCache: true

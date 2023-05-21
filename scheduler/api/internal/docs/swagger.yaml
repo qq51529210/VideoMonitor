@@ -24,6 +24,9 @@ definitions:
       createdAt:
         description: 数据库的创建时间，时间戳，
         type: integer
+      data:
+        description: 保存的天数
+        type: string
       enable:
         description: |-
           是否禁用
@@ -39,9 +42,6 @@ definitions:
       peroids:
         description: 是一个 RecordTime 的 JSON 数组
         type: string
-      saveDays:
-        description: 保存的天数
-        type: integer
       updatedAt:
         description: 数据库的更新时间
         type: integer
@@ -86,6 +86,9 @@ definitions:
     type: object
   weekplans.patchReq:
     properties:
+      data:
+        description: 附加的数据
+        type: string
       enable:
         description: |-
           是否禁用
@@ -108,15 +111,14 @@ definitions:
         maxItems: 7
         minItems: 1
         type: array
-      saveDays:
-        description: 保存的天数
-        minimum: 1
-        type: integer
     required:
     - peroids
     type: object
   weekplans.postReq:
     properties:
+      data:
+        description: 附加的数据
+        type: string
       enable:
         description: |-
           是否禁用，默认是 1
@@ -139,10 +141,6 @@ definitions:
         maxItems: 7
         minItems: 1
         type: array
-      saveDays:
-        description: 保存的天数，默认是 1
-        minimum: 1
-        type: integer
     required:
     - name
     - peroids
@@ -233,11 +231,6 @@ paths:
         in: query
         name: order
         type: string
-      - description: 保存的天数
-        in: query
-        minimum: 1
-        name: saveDays
-        type: integer
       produces:
       - application/json
       responses:

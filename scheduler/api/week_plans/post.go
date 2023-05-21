@@ -18,21 +18,21 @@ type postReq struct {
 	// 0: 禁用
 	// 1: 启用
 	Enable *int8 `json:"enable" binding:"omitempty,oneof=0 1"`
-	// 保存的天数，默认是 1
-	SaveDays *uint32 `json:"saveDays" binding:"omitempty,min=1"`
 	// 一周的时间数组
 	Peroids [][]*db.TimePeroid `json:"peroids" binding:"required,min=1,max=7,dive,required,min=1,dive"`
+	// 附加的数据
+	Data *string `json:"data" binding:"omitempty"`
 }
 
-//	@Summary	添加
-//	@Tags		周计划
-//	@Param		data	body	postReq	true	"数据"
-//	@Accept		json
-//	@Produce	json
-//	@Success	201	{object}	internal.IDResult[int64]
-//	@Failure	400	{object}	internal.Error
-//	@Failure	500	{object}	internal.Error
-//	@Router		/week_plans [post]
+// @Summary	添加
+// @Tags		周计划
+// @Param		data	body	postReq	true	"数据"
+// @Accept		json
+// @Produce	json
+// @Success	201	{object}	internal.IDResult[int64]
+// @Failure	400	{object}	internal.Error
+// @Failure	500	{object}	internal.Error
+// @Router		/week_plans [post]
 func post(ctx *gin.Context) {
 	// 参数
 	var req postReq

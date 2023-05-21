@@ -55,10 +55,10 @@ type WeekPlan struct {
 	// 0: 禁用
 	// 1: 启用
 	Enable *int8 `json:"enable" gorm:"not null;default:0"`
-	// 保存的天数
-	SaveDays *uint32 `json:"saveDays" gorm:"not null;default:1"`
 	// 是一个 RecordTime 的 JSON 数组
 	Peroids *string `json:"peroids" gorm:"not null;type:text"`
+	// 保存的天数
+	Data *string `json:"data" gorm:"type:text"`
 }
 
 // WeekPlanQuery 是 WeekPlan 的查询参数
@@ -69,8 +69,6 @@ type WeekPlanQuery struct {
 	Name string `form:"name" binding:"omitempty,max=32"`
 	// 是否禁用，精确匹配
 	Enable *int8 `form:"enable" binding:"omitempty,oneof=0 1"`
-	// 保存的天数
-	SaveDays *int32 `form:"saveDays" binding:"omitempty,min=1"`
 }
 
 // Init 实现 Query 接口
@@ -83,10 +81,6 @@ func (q *WeekPlanQuery) Init(db *gorm.DB) *gorm.DB {
 	// 是否禁用
 	if q.Enable != nil {
 		db = db.Where("`Enable` = ?", *q.Enable)
-	}
-	// 保存的天数
-	if q.SaveDays != nil {
-		db = db.Where("`SaveDays` = ?", *q.SaveDays)
 	}
 	//
 	return db

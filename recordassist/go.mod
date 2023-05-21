@@ -1,18 +1,16 @@
-module scheduler
+module recordassist
 
 go 1.20
 
 require (
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-playground/validator/v10 v10.13.0
-	github.com/go-sql-driver/mysql v1.7.1
 	github.com/qq51529210/log v0.0.0-20230516063534-80e6e0a1e8f6
 	github.com/qq51529210/util v0.0.0-20230517142048-a7fcc43cf037
-	github.com/qq51529210/uuid v0.0.0-20230116075911-debb68a3e58d
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.1
-	gorm.io/driver/mysql v1.5.0
+	gorm.io/driver/sqlite v1.5.1
 	gorm.io/gorm v1.25.1
 )
 
@@ -36,6 +34,7 @@ require (
 	github.com/leodido/go-urn v1.2.3 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
+	github.com/mattn/go-sqlite3 v1.14.16 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421 // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect

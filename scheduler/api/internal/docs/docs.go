@@ -88,13 +88,6 @@ const docTemplate = `{
                         "description": "排序，\"column [desc]\"",
                         "name": "order",
                         "in": "query"
-                    },
-                    {
-                        "minimum": 1,
-                        "type": "integer",
-                        "description": "保存的天数",
-                        "name": "saveDays",
-                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -481,6 +474,10 @@ const docTemplate = `{
                     "description": "数据库的创建时间，时间戳，",
                     "type": "integer"
                 },
+                "data": {
+                    "description": "保存的天数",
+                    "type": "string"
+                },
                 "enable": {
                     "description": "是否禁用\n0: 禁用\n1: 启用",
                     "type": "integer"
@@ -496,10 +493,6 @@ const docTemplate = `{
                 "peroids": {
                     "description": "是一个 RecordTime 的 JSON 数组",
                     "type": "string"
-                },
-                "saveDays": {
-                    "description": "保存的天数",
-                    "type": "integer"
                 },
                 "updatedAt": {
                     "description": "数据库的更新时间",
@@ -567,6 +560,10 @@ const docTemplate = `{
                 "peroids"
             ],
             "properties": {
+                "data": {
+                    "description": "附加的数据",
+                    "type": "string"
+                },
                 "enable": {
                     "description": "是否禁用\n0: 禁用\n1: 启用",
                     "type": "integer",
@@ -591,11 +588,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/db.TimePeroid"
                         }
                     }
-                },
-                "saveDays": {
-                    "description": "保存的天数",
-                    "type": "integer",
-                    "minimum": 1
                 }
             }
         },
@@ -606,6 +598,10 @@ const docTemplate = `{
                 "peroids"
             ],
             "properties": {
+                "data": {
+                    "description": "附加的数据",
+                    "type": "string"
+                },
                 "enable": {
                     "description": "是否禁用，默认是 1\n0: 禁用\n1: 启用",
                     "type": "integer",
@@ -630,11 +626,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/db.TimePeroid"
                         }
                     }
-                },
-                "saveDays": {
-                    "description": "保存的天数，默认是 1",
-                    "type": "integer",
-                    "minimum": 1
                 }
             }
         }

@@ -80,6 +80,9 @@ func (c *checker) all() []*weekplan {
 
 // checkRoutine 检查协程
 func (c *checker) checkRoutine() {
+	defer func() {
+		log.Recover(recover())
+	}()
 	timer := time.NewTimer(0)
 	for {
 		// 时间到
