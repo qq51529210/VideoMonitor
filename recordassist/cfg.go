@@ -29,14 +29,13 @@ type cfgLog struct {
 
 // cfgDB 数据库的配置
 type cfgDB struct {
-	URL         string `json:"url" yaml:"url"`
-	EnableCache bool   `json:"enableCache" yaml:"enableCache"`
+	URL string `json:"url" yaml:"url"`
 }
 
 // cfgZLM 检查配置
 type cfgZLM struct {
 	// 文件根目录
-	Dir string `json:"dir" yaml:"dir" validate:"required,filepath"`
+	Dir string `json:"dir" yaml:"dir" validate:"omitempty,filepath"`
 	// 检查间隔，最小 1 秒
 	CheckInterval int `json:"checkInterval" yaml:"checkInterval" validate:"required,min=1"`
 	// API 调用的超时，单位秒

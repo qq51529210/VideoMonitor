@@ -1,7 +1,7 @@
 package db
 
 import (
-	"gorm.io/driver/sqlite"
+	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 )
@@ -16,7 +16,7 @@ var (
 )
 
 // Init 初始化数据
-func Init(uri string, cache bool) error {
+func Init(uri string) error {
 	// 连接
 	err := initDB(uri)
 	if err != nil {
@@ -32,8 +32,6 @@ func Init(uri string, cache bool) error {
 	if err != nil {
 		return err
 	}
-	//
-	enableCache = cache
 	//
 	return nil
 }

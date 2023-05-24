@@ -1,9 +1,12 @@
 package zlm
 
 import (
+	"net/http"
 	"recordassist/api/internal"
+	"recordassist/db"
 
 	"github.com/gin-gonic/gin"
+	"github.com/qq51529210/log"
 )
 
 // "mediaServerId" : "your_server_id",
@@ -18,16 +21,21 @@ import (
 // "url" : "record/live/obs/2019-09-20/15-53-02.mp4",
 // "vhost" : "__defaultVhost__"
 type postReq struct {
-	VHost     string `json:"vhost"`
-	App       string `json:"app"`
-	Stream    string `json:"stream"`
-	FileName  string `json:"file_name"`
-	FilePath  string `json:"file_path"`
-	FileSize  string `json:"file_size"`
-	Folder    string `json:"folder"`
-	StartTime string `json:"start_time"`
-	TimeLen   string `json:"time_len"`
-	URL       string `json:"url"`
+	App       string  `json:"app"`
+	Stream    string  `json:"stream"`
+	FilePath  string  `json:"file_path"`
+	FileSize  int64   `json:"file_size"`
+	StartTime int64   `json:"start_time"`
+	TimeLen   float64 `json:"time_len"`
+	// VHost         string  `json:"vhost"`
+	// FileName      string  `json:"file_name"`
+	// Folder        string  `json:"folder"`
+	// URL           string  `json:"url"`
+	// MediaServerID string  `json:"mediaServerId"`
+}
+
+type postRes struct {
+	Code int `json:"code"`
 }
 
 func post(ctx *gin.Context) {
@@ -38,5 +46,20 @@ func post(ctx *gin.Context) {
 		internal.Handle400(ctx, err)
 		return
 	}
-
+	// 数据库
+	var model db.Record
+	model.App = req.App
+	model.Stream = req.Stream
+	model.Path = req.FilePath
+	model.Size = req.FileSize
+	model.CreateTime = req.StartTime
+	model.Duration = req.TimeLen
+	model.Status = db.RecordStatusReady
+	_, err = db.Add(&model)
+	if err != nil {
+		log.Errorf("add file %s to db error:%s", req.FilePath, err.Error())
+		ctx.JSON(http.StatusOK, &postRes{Code: 500})
+		return
+	}
+	ctx.JSON(http.StatusOK, &postRes{Code: 0})
 }
