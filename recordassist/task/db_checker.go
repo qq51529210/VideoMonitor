@@ -6,7 +6,6 @@ import (
 	"net/url"
 	"os"
 	"recordassist/db"
-	"recordassist/store"
 	"sync"
 	"time"
 
@@ -29,6 +28,8 @@ type dbChecker struct {
 	apiGetSaveDaysURL string
 	// 提交录像数据 API
 	apiPostRecordURL string
+	// 上传函数
+	upload func(path string) (url string, err error)
 }
 
 // routine 检查数据库中的任务
@@ -79,7 +80,7 @@ func (c *dbChecker) handleStep0Routine(model *db.Record) {
 		if model.Status == db.RecordStatusUploaded {
 			if err := db.UpdateRecord(model.Path, map[string]any{
 				"Status": model.Status,
-				"URL":    model.URL,
+				"Name":   model.Name,
 			}); err != nil {
 				log.ErrorfDepth(1, "update db record error: %s", err.Error())
 			}
@@ -107,12 +108,13 @@ func (c *dbChecker) handleStep0Routine(model *db.Record) {
 // handleStep0 上传
 func (c *dbChecker) handleStep0(model *db.Record) bool {
 	// 上传
-	err := store.Upload(model.Path)
+	name, err := c.upload(model.Path)
 	if err != nil {
 		log.Errorf("upload file %s error: %s", model.Path, err.Error())
 		return false
 	}
 	//
+	model.Name = name
 	model.Status = db.RecordStatusUploaded
 	return true
 }

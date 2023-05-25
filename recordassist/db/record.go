@@ -26,8 +26,8 @@ type Record struct {
 	Duration float64 ` gorm:""`
 	// 大小
 	Size int64 `gorm:""`
-	// 存储的地址
-	URL string `gorm:"type:varchar(512)"`
+	// 存储的 key
+	Name string `gorm:"type:varchar(40)"`
 	// app dir
 	App string `gorm:"type:varchar(64)"`
 	// stream dir
