@@ -141,9 +141,14 @@ func (c *dbChecker) handleStep1Routine(model *db.Record) {
 	}
 }
 
+type getSaveDaysRes struct {
+	// 关联的计划保存的天数
+	Days []int64 `json:"days"`
+	// 是否在录像时间内
+	IsRecording bool `json:"isRecording"`
+}
+
 type postRecordReq struct {
-	// 保存天数
-	SaveDays int64 `json:"saveDays"`
 	// 创建时间
 	CreateTime int64 `json:"createTime"`
 	// 时长
@@ -151,11 +156,15 @@ type postRecordReq struct {
 	// 大小
 	Size int64 `json:"size"`
 	// 存储的地址
-	URL string `json:"url"`
+	Name string `json:"name"`
 	// app
 	App string `json:"app"`
 	// stream
 	Stream string `json:"stream"`
+	// 保存天数
+	SaveDays int64 `json:"saveDays"`
+	// 是否在录像时间内
+	IsRecording bool `json:"isRecording"`
 }
 
 // handleStep1 到计划管理查询保存天数，然后提交数据到录像管理
@@ -165,7 +174,7 @@ func (c *dbChecker) handleStep1(model *db.Record) bool {
 	query := make(url.Values)
 	query.Set("stream", stream)
 	// 查询请求
-	var res []int64
+	var res getSaveDaysRes
 	err := util.HTTP[any](http.MethodGet, c.apiGetSaveDaysURL, query, nil, &res, http.StatusOK, c.apiCallTimeout)
 	if err != nil {
 		log.Errorf("api call: query save days of stream %s error: %s", stream, err.Error())
@@ -174,6 +183,9 @@ func (c *dbChecker) handleStep1(model *db.Record) bool {
 	// 提交录像
 	var postReq postRecordReq
 	util.CopyStruct(&postReq, model)
+	// 最大的
+	postReq.SaveDays = util.MaxIn(res.Days)
+	postReq.IsRecording = res.IsRecording
 	err = util.HTTP[postRecordReq, any](http.MethodPost, c.apiGetSaveDaysURL, query, &postReq, nil, http.StatusCreated, c.apiCallTimeout)
 	if err != nil {
 		log.Errorf("api call: submit data of file %s error: %s", model.Path, err.Error())

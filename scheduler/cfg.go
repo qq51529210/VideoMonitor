@@ -24,7 +24,7 @@ type cfgLog struct {
 	// 是否输出到控制台，out/err
 	Std string `json:"std" yaml:"std" validate:"omitempty,oneof=out err"`
 	// 禁用的日志级别
-	DisableLevel []string `json:"disableLevel" yaml:"disableLevel" validate:"omitempty,dive,oneof=out err"`
+	DisableLevel []string `json:"disableLevel" yaml:"disableLevel" validate:"omitempty,dive,oneof=debug info warn error"`
 }
 
 // cfgDB 数据库的配置
