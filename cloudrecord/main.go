@@ -5,7 +5,6 @@ import (
 	"cloudrecord/db"
 
 	"github.com/qq51529210/log"
-	"github.com/qq51529210/util"
 )
 
 // @Title		接口文档
@@ -20,7 +19,7 @@ func main() {
 		panic(err)
 	}
 	// 日志
-	err = util.InitLog(&_cfg.Log)
+	// err = util.InitLog(&_cfg.Log)
 	if err != nil {
 		panic(err)
 	}

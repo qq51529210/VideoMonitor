@@ -39,7 +39,7 @@ type Record struct {
 
 // RecordQuery 实现接口 util.GORMQuery
 type RecordQuery struct {
-	Page util.GORMPage
+	util.GORMPage
 	// app ，精确
 	App string `json:"app" form:"app" binding:"omitempty,max=64" gq:"eq"`
 	// stream ，精确

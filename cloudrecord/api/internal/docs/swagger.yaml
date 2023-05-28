@@ -1,50 +1,33 @@
 definitions:
-  db.ListData-db_WeekPlan:
-    properties:
-      data:
-        description: 列表
-        items:
-          $ref: '#/definitions/db.Record'
-        type: array
-      total:
-        description: 总数
-        type: integer
-    type: object
-  db.TimePeroid:
-    properties:
-      end:
-        description: 结束时间戳
-        type: string
-      start:
-        description: 开始时间戳
-        type: string
-    type: object
   db.Record:
     properties:
-      createdAt:
-        description: 数据库的创建时间，时间戳，
-        type: integer
-      data:
-        description: 保存的天数
+      app:
+        description: app
         type: string
-      enable:
-        description: |-
-          是否禁用
-          0: 禁用
-          1: 启用
+      createTime:
+        description: 创建时间戳
         type: integer
+      deleteTime:
+        description: 删除时间戳
+        type: integer
+      duration:
+        description: 时长，单位秒
+        type: number
       id:
-        description: 数据库ID
-        type: string
-      name:
         description: 名称
         type: string
-      peroids:
-        description: 是一个 RecordTime 的 JSON 数组
-        type: string
-      updatedAt:
-        description: 数据库的更新时间
+      isDeleted:
+        description: 软删除
         type: integer
+      isRecording:
+        description: 是否在录像时间内的文件
+        type: integer
+      size:
+        description: 大小，字节
+        type: integer
+      stream:
+        description: stream
+        type: string
     type: object
   internal.Error:
     properties:
@@ -54,96 +37,64 @@ definitions:
         description: 简短信息
         type: string
     type: object
-  internal.IDResult-int64:
+  internal.IDResult-string:
     properties:
       id:
         description: 数据库 ID
-        type: integer
+        type: string
     type: object
-  internal.RowResult:
+  records.postReq:
     properties:
-      row:
-        description: 行数
+      app:
+        description: app
+        maxLength: 64
+        type: string
+      createTime:
+        description: 创建时间
+        minimum: 1
         type: integer
-    type: object
-  tasks.tasks:
-    properties:
-      id:
-        description: 流的唯一标识
-        type: string
-      startCallback:
-        description: 开始录像回调
-        maxLength: 255
-        type: string
-      stopCallback:
-        description: 停止录像回调
-        maxLength: 255
-        type: string
-    required:
-    - id
-    - startCallback
-    - stopCallback
-    type: object
-  weekplans.patchReq:
-    properties:
-      data:
-        description: 附加的数据
-        type: string
-      enable:
-        description: |-
-          是否禁用
-          0: 禁用
-          1: 启用
-        enum:
-        - 0
-        - 1
-        type: integer
+      duration:
+        description: 时长
+        minimum: 1
+        type: number
+      isRecording:
+        description: 是否在录像时间内
+        type: boolean
       name:
-        description: 名称
-        maxLength: 32
+        description: minio 的标识
+        maxLength: 40
         type: string
-      peroids:
-        description: 一周的时间数组
-        items:
-          items:
-            $ref: '#/definitions/db.TimePeroid'
-          type: array
-        maxItems: 7
-        minItems: 1
-        type: array
-    required:
-    - peroids
-    type: object
-  weekplans.postReq:
-    properties:
-      data:
-        description: 附加的数据
-        type: string
-      enable:
-        description: |-
-          是否禁用，默认是 1
-          0: 禁用
-          1: 启用
-        enum:
-        - 0
-        - 1
+      saveDays:
+        description: 保存天数
+        minimum: 0
         type: integer
-      name:
-        description: 名称
-        maxLength: 32
+      size:
+        description: 大小
+        minimum: 1
+        type: integer
+      stream:
+        description: stream
+        maxLength: 64
         type: string
-      peroids:
-        description: 一周的时间数组
-        items:
-          items:
-            $ref: '#/definitions/db.TimePeroid'
-          type: array
-        maxItems: 7
-        minItems: 1
-        type: array
     required:
+    - app
+    - createTime
+    - duration
     - name
-    - peroids
+    - saveDays
+    - size
+    - stream
+    type: object
+  util.GORMList-db_Record:
+    properties:
+      data:
+        description: 列表
+        items:
+          $ref: '#/definitions/db.Record'
+        type: array
+      total:
+        description: 总数
+        type: integer
     type: object
 info:
   contact: {}
@@ -157,7 +108,7 @@ paths:
       parameters:
       - description: 条件
         in: body
-        name: data
+        name: ids
         required: true
         schema:
           items:
@@ -184,44 +135,56 @@ paths:
       - ApiKeyAuth: []
       summary: 批量删除
       tags:
-      - 周计划
+      - 云端录像
     get:
       parameters:
-      - description: 创建时间，时间戳，范围匹配，CreatedAt >= CreatedAtAfter
+      - description: 大于创建时间戳，比较
         in: query
-        minimum: 0
-        name: afterCreatedAt
+        name: afterCreateTime
         type: integer
-      - description: 更新时间，时间戳，范围匹配，UpdateAt >= UpdatedAtAfter
+      - description: app ，精确
         in: query
-        minimum: 0
-        name: afterUpdatedAt
-        type: integer
-      - description: 创建时间，时间戳，范围匹配，CreatedAt < CreatedBefore
+        maxLength: 64
+        name: app
+        type: string
+      - description: 小于删除时间戳 ，比较
         in: query
-        name: beforeCreatedAt
-        type: integer
-      - description: 更新时间，时间戳，范围匹配，UpdateAt < UpdatedAtBefore
-        in: query
-        name: beforeUpdatedAt
+        name: beforeDeleteTime
         type: integer
       - description: 条数，小于 1 不匹配
         in: query
         minimum: 1
         name: count
         type: integer
-      - description: 是否禁用，精确匹配
+      - description: 创建时间戳 ，精确
+        in: query
+        minimum: 0
+        name: createTime
+        type: integer
+      - description: 删除时间戳 ，精确
+        in: query
+        minimum: 0
+        name: deleteTime
+        type: integer
+      - description: 时长，单位秒 ，精确
+        in: query
+        minimum: 0
+        name: duration
+        type: number
+      - description: 软删除 ，精确
         enum:
         - 0
         - 1
         in: query
-        name: enable
+        name: isDeleted
         type: integer
-      - description: 名称，模糊匹配
+      - description: 是否在录像时间内的文件 ，精确
+        enum:
+        - 0
+        - 1
         in: query
-        maxLength: 32
-        name: name
-        type: string
+        name: isRecording
+        type: integer
       - description: 偏移，小于 0 不匹配
         in: query
         minimum: 0
@@ -231,13 +194,23 @@ paths:
         in: query
         name: order
         type: string
+      - description: 大小，字节 ，精确
+        in: query
+        minimum: 0
+        name: size
+        type: integer
+      - description: stream ，精确
+        in: query
+        maxLength: 64
+        name: stream
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/db.ListData-db_WeekPlan'
+            $ref: '#/definitions/util.GORMList-db_Record'
         "400":
           description: Bad Request
           schema:
@@ -248,7 +221,7 @@ paths:
             $ref: '#/definitions/internal.Error'
       summary: 列表
       tags:
-      - 周计划
+      - 云端录像
     post:
       consumes:
       - application/json
@@ -258,14 +231,14 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/weekplans.postReq'
+          $ref: '#/definitions/records.postReq'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/internal.IDResult-int64'
+            $ref: '#/definitions/internal.IDResult-string'
         "400":
           description: Bad Request
           schema:
@@ -276,13 +249,13 @@ paths:
             $ref: '#/definitions/internal.Error'
       summary: 添加
       tags:
-      - 周计划
+      - 云端录像
   /records/{id}:
     delete:
       consumes:
       - application/json
       parameters:
-      - description: WeekPlan.ID
+      - description: 主键
         in: path
         name: id
         required: true
@@ -300,10 +273,10 @@ paths:
             $ref: '#/definitions/internal.Error'
       summary: 删除
       tags:
-      - 周计划
+      - 云端录像
     get:
       parameters:
-      - description: WeekPlan.ID
+      - description: 主键
         in: path
         name: id
         required: true
@@ -325,105 +298,5 @@ paths:
             $ref: '#/definitions/internal.Error'
       summary: 详情
       tags:
-      - 周计划
-    patch:
-      consumes:
-      - application/json
-      parameters:
-      - description: WeekPlan.ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: 数据
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/weekplans.patchReq'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/internal.RowResult'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/internal.Error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/internal.Error'
-      summary: 修改
-      tags:
-      - 周计划
-  /records/{id}/tasks:
-    delete:
-      consumes:
-      - application/json
-      parameters:
-      - description: WeekPlan.ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: 自定义的任务 ID 数组
-        in: body
-        name: data
-        required: true
-        schema:
-          items:
-            type: string
-          type: array
-      responses:
-        "204":
-          description: No Content
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/internal.Error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/internal.Error'
-      summary: 删除任务
-      tags:
-      - 周计划
-    put:
-      consumes:
-      - application/json
-      parameters:
-      - description: WeekPlan.ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: 任务数组
-        in: body
-        name: data
-        required: true
-        schema:
-          items:
-            $ref: '#/definitions/tasks.tasks'
-          type: array
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/internal.IDResult-int64'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/internal.Error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/internal.Error'
-      summary: 添加任务
-      tags:
-      - 周计划
+      - 云端录像
 swagger: "2.0"

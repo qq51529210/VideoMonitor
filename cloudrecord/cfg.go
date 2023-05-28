@@ -20,7 +20,7 @@ type cfgDB struct {
 type cfg struct {
 	Name string      `json:"name" yaml:"name" validate:"required"`
 	Port int         `json:"port" yaml:"port" validate:"required,min=1"`
-	Log  util.LogCfg `json:"log" yaml:"log"`
+	Log  util.LogCfg `json:"log" yaml:"log" validate:"required,dive"`
 	DB   cfgDB       `json:"db" yaml:"db"`
 }
 
@@ -37,7 +37,7 @@ func loadCfg() error {
 	}
 	// 检查
 	val := validator.New()
-	err = val.Struct(_cfg)
+	err = val.Struct(&_cfg)
 	if err != nil {
 		return err
 	}

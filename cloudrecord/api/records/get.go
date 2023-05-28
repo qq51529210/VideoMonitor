@@ -8,14 +8,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Summary	详情
-// @Tags		云端录像
-// @Param		id	path	string	true	"主键"
-// @Produce	json
-// @Success	200	{object}	db.Record
-// @Failure	404	{object}	internal.Error
-// @Failure	500	{object}	internal.Error
-// @Router		/records/{id} [get]
+//	@Summary	详情
+//	@Tags		云端录像
+//	@Param		id	path	string	true	"主键"
+//	@Produce	json
+//	@Success	200	{object}	db.Record
+//	@Failure	404	{object}	internal.Error
+//	@Failure	500	{object}	internal.Error
+//	@Router		/records/{id} [get]
 func get(ctx *gin.Context) {
 	// 参数
 	var id internal.IDPath[string]

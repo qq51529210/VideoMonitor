@@ -12,34 +12,27 @@
                     "application/json"
                 ],
                 "tags": [
-                    "周计划"
+                    "云端录像"
                 ],
                 "summary": "列表",
                 "parameters": [
                     {
-                        "minimum": 0,
                         "type": "integer",
-                        "description": "创建时间，时间戳，范围匹配，CreatedAt \u003e= CreatedAtAfter",
-                        "name": "afterCreatedAt",
+                        "description": "大于创建时间戳，比较",
+                        "name": "afterCreateTime",
                         "in": "query"
                     },
                     {
-                        "minimum": 0,
-                        "type": "integer",
-                        "description": "更新时间，时间戳，范围匹配，UpdateAt \u003e= UpdatedAtAfter",
-                        "name": "afterUpdatedAt",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "创建时间，时间戳，范围匹配，CreatedAt \u003c CreatedBefore",
-                        "name": "beforeCreatedAt",
+                        "maxLength": 64,
+                        "type": "string",
+                        "description": "app ，精确",
+                        "name": "app",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "更新时间，时间戳，范围匹配，UpdateAt \u003c UpdatedAtBefore",
-                        "name": "beforeUpdatedAt",
+                        "description": "小于删除时间戳 ，比较",
+                        "name": "beforeDeleteTime",
                         "in": "query"
                     },
                     {
@@ -50,20 +43,44 @@
                         "in": "query"
                     },
                     {
+                        "minimum": 0,
+                        "type": "integer",
+                        "description": "创建时间戳 ，精确",
+                        "name": "createTime",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 0,
+                        "type": "integer",
+                        "description": "删除时间戳 ，精确",
+                        "name": "deleteTime",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 0,
+                        "type": "number",
+                        "description": "时长，单位秒 ，精确",
+                        "name": "duration",
+                        "in": "query"
+                    },
+                    {
                         "enum": [
                             0,
                             1
                         ],
                         "type": "integer",
-                        "description": "是否禁用，精确匹配",
-                        "name": "enable",
+                        "description": "软删除 ，精确",
+                        "name": "isDeleted",
                         "in": "query"
                     },
                     {
-                        "maxLength": 32,
-                        "type": "string",
-                        "description": "名称，模糊匹配",
-                        "name": "name",
+                        "enum": [
+                            0,
+                            1
+                        ],
+                        "type": "integer",
+                        "description": "是否在录像时间内的文件 ，精确",
+                        "name": "isRecording",
                         "in": "query"
                     },
                     {
@@ -78,13 +95,27 @@
                         "description": "排序，\"column [desc]\"",
                         "name": "order",
                         "in": "query"
+                    },
+                    {
+                        "minimum": 0,
+                        "type": "integer",
+                        "description": "大小，字节 ，精确",
+                        "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "maxLength": 64,
+                        "type": "string",
+                        "description": "stream ，精确",
+                        "name": "stream",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/db.ListData-db_WeekPlan"
+                            "$ref": "#/definitions/util.GORMList-db_Record"
                         }
                     },
                     "400": {
@@ -109,7 +140,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "周计划"
+                    "云端录像"
                 ],
                 "summary": "添加",
                 "parameters": [
@@ -119,7 +150,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/weekplans.postReq"
+                            "$ref": "#/definitions/records.postReq"
                         }
                     }
                 ],
@@ -127,7 +158,7 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/internal.IDResult-int64"
+                            "$ref": "#/definitions/internal.IDResult-string"
                         }
                     },
                     "400": {
@@ -157,13 +188,13 @@
                     "application/json"
                 ],
                 "tags": [
-                    "周计划"
+                    "云端录像"
                 ],
                 "summary": "批量删除",
                 "parameters": [
                     {
                         "description": "条件",
-                        "name": "data",
+                        "name": "ids",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -205,13 +236,13 @@
                     "application/json"
                 ],
                 "tags": [
-                    "周计划"
+                    "云端录像"
                 ],
                 "summary": "详情",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "WeekPlan.ID",
+                        "description": "主键",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -243,168 +274,16 @@
                     "application/json"
                 ],
                 "tags": [
-                    "周计划"
+                    "云端录像"
                 ],
                 "summary": "删除",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "WeekPlan.ID",
+                        "description": "主键",
                         "name": "id",
                         "in": "path",
                         "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/internal.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/internal.Error"
-                        }
-                    }
-                }
-            },
-            "patch": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "周计划"
-                ],
-                "summary": "修改",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "WeekPlan.ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "数据",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/weekplans.patchReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/internal.RowResult"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/internal.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/internal.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/records/{id}/tasks": {
-            "put": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "周计划"
-                ],
-                "summary": "添加任务",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "WeekPlan.ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "任务数组",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/tasks.tasks"
-                            }
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/internal.IDResult-int64"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/internal.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/internal.Error"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "周计划"
-                ],
-                "summary": "删除任务",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "WeekPlan.ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "自定义的任务 ID 数组",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        }
                     }
                 ],
                 "responses": {
@@ -428,65 +307,44 @@
         }
     },
     "definitions": {
-        "db.ListData-db_WeekPlan": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "description": "列表",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/db.Record"
-                    }
-                },
-                "total": {
-                    "description": "总数",
-                    "type": "integer"
-                }
-            }
-        },
-        "db.TimePeroid": {
-            "type": "object",
-            "properties": {
-                "end": {
-                    "description": "结束时间戳",
-                    "type": "string"
-                },
-                "start": {
-                    "description": "开始时间戳",
-                    "type": "string"
-                }
-            }
-        },
         "db.Record": {
             "type": "object",
             "properties": {
-                "createdAt": {
-                    "description": "数据库的创建时间，时间戳，",
-                    "type": "integer"
-                },
-                "data": {
-                    "description": "保存的天数",
+                "app": {
+                    "description": "app",
                     "type": "string"
                 },
-                "enable": {
-                    "description": "是否禁用\n0: 禁用\n1: 启用",
+                "createTime": {
+                    "description": "创建时间戳",
                     "type": "integer"
+                },
+                "deleteTime": {
+                    "description": "删除时间戳",
+                    "type": "integer"
+                },
+                "duration": {
+                    "description": "时长，单位秒",
+                    "type": "number"
                 },
                 "id": {
-                    "description": "数据库ID",
-                    "type": "string"
-                },
-                "name": {
                     "description": "名称",
                     "type": "string"
                 },
-                "peroids": {
-                    "description": "是一个 RecordTime 的 JSON 数组",
-                    "type": "string"
-                },
-                "updatedAt": {
-                    "description": "数据库的更新时间",
+                "isDeleted": {
+                    "description": "软删除",
                     "type": "integer"
+                },
+                "isRecording": {
+                    "description": "是否在录像时间内的文件",
+                    "type": "integer"
+                },
+                "size": {
+                    "description": "大小，字节",
+                    "type": "integer"
+                },
+                "stream": {
+                    "description": "stream",
+                    "type": "string"
                 }
             }
         },
@@ -502,120 +360,81 @@
                 }
             }
         },
-        "internal.IDResult-int64": {
+        "internal.IDResult-string": {
             "type": "object",
             "properties": {
                 "id": {
                     "description": "数据库 ID",
-                    "type": "integer"
-                }
-            }
-        },
-        "internal.RowResult": {
-            "type": "object",
-            "properties": {
-                "row": {
-                    "description": "行数",
-                    "type": "integer"
-                }
-            }
-        },
-        "tasks.tasks": {
-            "type": "object",
-            "required": [
-                "id",
-                "startCallback",
-                "stopCallback"
-            ],
-            "properties": {
-                "id": {
-                    "description": "流的唯一标识",
                     "type": "string"
-                },
-                "startCallback": {
-                    "description": "开始录像回调",
-                    "type": "string",
-                    "maxLength": 255
-                },
-                "stopCallback": {
-                    "description": "停止录像回调",
-                    "type": "string",
-                    "maxLength": 255
                 }
             }
         },
-        "weekplans.patchReq": {
+        "records.postReq": {
             "type": "object",
             "required": [
-                "peroids"
-            ],
-            "properties": {
-                "data": {
-                    "description": "附加的数据",
-                    "type": "string"
-                },
-                "enable": {
-                    "description": "是否禁用\n0: 禁用\n1: 启用",
-                    "type": "integer",
-                    "enum": [
-                        0,
-                        1
-                    ]
-                },
-                "name": {
-                    "description": "名称",
-                    "type": "string",
-                    "maxLength": 32
-                },
-                "peroids": {
-                    "description": "一周的时间数组",
-                    "type": "array",
-                    "maxItems": 7,
-                    "minItems": 1,
-                    "items": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/definitions/db.TimePeroid"
-                        }
-                    }
-                }
-            }
-        },
-        "weekplans.postReq": {
-            "type": "object",
-            "required": [
+                "app",
+                "createTime",
+                "duration",
                 "name",
-                "peroids"
+                "saveDays",
+                "size",
+                "stream"
             ],
             "properties": {
-                "data": {
-                    "description": "附加的数据",
-                    "type": "string"
+                "app": {
+                    "description": "app",
+                    "type": "string",
+                    "maxLength": 64
                 },
-                "enable": {
-                    "description": "是否禁用，默认是 1\n0: 禁用\n1: 启用",
+                "createTime": {
+                    "description": "创建时间",
                     "type": "integer",
-                    "enum": [
-                        0,
-                        1
-                    ]
+                    "minimum": 1
+                },
+                "duration": {
+                    "description": "时长",
+                    "type": "number",
+                    "minimum": 1
+                },
+                "isRecording": {
+                    "description": "是否在录像时间内",
+                    "type": "boolean"
                 },
                 "name": {
-                    "description": "名称",
+                    "description": "minio 的标识",
                     "type": "string",
-                    "maxLength": 32
+                    "maxLength": 40
                 },
-                "peroids": {
-                    "description": "一周的时间数组",
+                "saveDays": {
+                    "description": "保存天数",
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "size": {
+                    "description": "大小",
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "stream": {
+                    "description": "stream",
+                    "type": "string",
+                    "maxLength": 64
+                }
+            }
+        },
+        "util.GORMList-db_Record": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "列表",
                     "type": "array",
-                    "maxItems": 7,
-                    "minItems": 1,
                     "items": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/definitions/db.TimePeroid"
-                        }
+                        "$ref": "#/definitions/db.Record"
                     }
+                },
+                "total": {
+                    "description": "总数",
+                    "type": "integer"
                 }
             }
         }
