@@ -21,12 +21,12 @@ import (
 // "url" : "record/live/obs/2019-09-20/15-53-02.mp4",
 // "vhost" : "__defaultVhost__"
 type postReq struct {
-	App       string  `json:"app"`
-	Stream    string  `json:"stream"`
-	FilePath  string  `json:"file_path"`
-	FileSize  int64   `json:"file_size"`
-	StartTime int64   `json:"start_time"`
-	TimeLen   float64 `json:"time_len"`
+	App      string  `json:"app"`
+	Stream   string  `json:"stream"`
+	FilePath string  `json:"file_path"`
+	FileSize int64   `json:"file_size"`
+	Time     int64   `json:"start_time"`
+	TimeLen  float64 `json:"time_len"`
 	// VHost         string  `json:"vhost"`
 	// FileName      string  `json:"file_name"`
 	// Folder        string  `json:"folder"`
@@ -48,12 +48,12 @@ func post(ctx *gin.Context) {
 	}
 	// 数据库
 	var model db.Record
-	model.App = req.App
-	model.Stream = req.Stream
 	model.Path = req.FilePath
 	model.Size = req.FileSize
-	model.CreateTime = req.StartTime
+	model.Time = req.Time
 	model.Duration = req.TimeLen
+	model.App = req.App
+	model.Stream = req.Stream
 	model.Status = db.RecordStatusReady
 	_, err = db.Add(&model)
 	if err != nil {

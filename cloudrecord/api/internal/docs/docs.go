@@ -29,20 +29,13 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "大于创建时间戳，比较",
-                        "name": "afterCreateTime",
-                        "in": "query"
-                    },
-                    {
-                        "maxLength": 64,
-                        "type": "string",
-                        "description": "app ，精确",
-                        "name": "app",
+                        "name": "afterTime",
                         "in": "query"
                     },
                     {
                         "type": "integer",
                         "description": "小于删除时间戳 ，比较",
-                        "name": "beforeDeleteTime",
+                        "name": "beforeTime",
                         "in": "query"
                     },
                     {
@@ -50,47 +43,6 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "条数，小于 1 不匹配",
                         "name": "count",
-                        "in": "query"
-                    },
-                    {
-                        "minimum": 0,
-                        "type": "integer",
-                        "description": "创建时间戳 ，精确",
-                        "name": "createTime",
-                        "in": "query"
-                    },
-                    {
-                        "minimum": 0,
-                        "type": "integer",
-                        "description": "删除时间戳 ，精确",
-                        "name": "deleteTime",
-                        "in": "query"
-                    },
-                    {
-                        "minimum": 0,
-                        "type": "number",
-                        "description": "时长，单位秒 ，精确",
-                        "name": "duration",
-                        "in": "query"
-                    },
-                    {
-                        "enum": [
-                            0,
-                            1
-                        ],
-                        "type": "integer",
-                        "description": "软删除 ，精确",
-                        "name": "isDeleted",
-                        "in": "query"
-                    },
-                    {
-                        "enum": [
-                            0,
-                            1
-                        ],
-                        "type": "integer",
-                        "description": "是否在录像时间内的文件 ，精确",
-                        "name": "isRecording",
                         "in": "query"
                     },
                     {
@@ -104,13 +56,6 @@ const docTemplate = `{
                         "type": "string",
                         "description": "排序，\"column [desc]\"",
                         "name": "order",
-                        "in": "query"
-                    },
-                    {
-                        "minimum": 0,
-                        "type": "integer",
-                        "description": "大小，字节 ，精确",
-                        "name": "size",
                         "in": "query"
                     },
                     {
@@ -320,12 +265,8 @@ const docTemplate = `{
         "db.Record": {
             "type": "object",
             "properties": {
-                "app": {
-                    "description": "app",
-                    "type": "string"
-                },
                 "createTime": {
-                    "description": "创建时间戳",
+                    "description": "时间戳",
                     "type": "integer"
                 },
                 "deleteTime": {

@@ -1,11 +1,8 @@
 definitions:
   db.Record:
     properties:
-      app:
-        description: app
-        type: string
       createTime:
-        description: 创建时间戳
+        description: 时间戳
         type: integer
       deleteTime:
         description: 删除时间戳
@@ -140,50 +137,16 @@ paths:
       parameters:
       - description: 大于创建时间戳，比较
         in: query
-        name: afterCreateTime
+        name: afterTime
         type: integer
-      - description: app ，精确
-        in: query
-        maxLength: 64
-        name: app
-        type: string
       - description: 小于删除时间戳 ，比较
         in: query
-        name: beforeDeleteTime
+        name: beforeTime
         type: integer
       - description: 条数，小于 1 不匹配
         in: query
         minimum: 1
         name: count
-        type: integer
-      - description: 创建时间戳 ，精确
-        in: query
-        minimum: 0
-        name: createTime
-        type: integer
-      - description: 删除时间戳 ，精确
-        in: query
-        minimum: 0
-        name: deleteTime
-        type: integer
-      - description: 时长，单位秒 ，精确
-        in: query
-        minimum: 0
-        name: duration
-        type: number
-      - description: 软删除 ，精确
-        enum:
-        - 0
-        - 1
-        in: query
-        name: isDeleted
-        type: integer
-      - description: 是否在录像时间内的文件 ，精确
-        enum:
-        - 0
-        - 1
-        in: query
-        name: isRecording
         type: integer
       - description: 偏移，小于 0 不匹配
         in: query
@@ -194,11 +157,6 @@ paths:
         in: query
         name: order
         type: string
-      - description: 大小，字节 ，精确
-        in: query
-        minimum: 0
-        name: size
-        type: integer
       - description: stream ，精确
         in: query
         maxLength: 64

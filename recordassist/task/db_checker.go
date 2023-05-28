@@ -150,15 +150,13 @@ type getSaveDaysRes struct {
 
 type postRecordReq struct {
 	// 创建时间
-	CreateTime int64 `json:"createTime"`
+	Time int64 `json:"time"`
 	// 时长
 	Duration float64 ` json:"duration"`
 	// 大小
 	Size int64 `json:"size"`
 	// 存储的地址
 	Name string `json:"name"`
-	// app
-	App string `json:"app"`
 	// stream
 	Stream string `json:"stream"`
 	// 保存天数
@@ -184,6 +182,7 @@ func (c *dbChecker) handleStep1(model *db.Record) bool {
 	var postReq postRecordReq
 	util.CopyStruct(&postReq, model)
 	// 最大的
+	postReq.Stream = fmt.Sprintf("%s_%s", model.App, model.Stream)
 	postReq.SaveDays = util.MaxIn(res.Days)
 	postReq.IsRecording = res.IsRecording
 	err = util.HTTP[postRecordReq, any](http.MethodPost, c.apiGetSaveDaysURL, query, &postReq, nil, http.StatusCreated, c.apiCallTimeout)

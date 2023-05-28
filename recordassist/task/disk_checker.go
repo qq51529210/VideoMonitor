@@ -103,7 +103,7 @@ func (c *diskChecker) handleRecord(p string, d fs.DirEntry) {
 	}
 	if !ok {
 		model.Status = db.RecordStatusReady
-		model.CreateTime = cTime.Unix()
+		model.Time = cTime.Unix()
 		model.Duration = float64(dur) / float64(time.Second)
 		model.Size = info.Size()
 		model.Stream = part[n]

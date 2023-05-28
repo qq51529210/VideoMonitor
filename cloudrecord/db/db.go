@@ -6,7 +6,10 @@ import (
 	"gorm.io/gorm"
 )
 
-type Page util.GORMPage
+var (
+	Enable  = int8(1)
+	Disable = int8(0)
+)
 
 // Init 初始化数据
 func Init(uri string) error {

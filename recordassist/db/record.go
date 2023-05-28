@@ -15,13 +15,8 @@ type Record struct {
 	// 本地路径
 	// ../live/obs/2019-09-20/15-53-02.mp4
 	Path string `gorm:"primaryKey;type:varchar(255)"`
-	// 状态
-	// ready 录像完成
-	// uploaded 已上传
-	// submitted 已提交
-	Status string `gorm:"not null"`
 	// 创建时间
-	CreateTime int64 `gorm:"index"`
+	Time int64 `gorm:""`
 	// 时长
 	Duration float64 ` gorm:""`
 	// 大小
@@ -32,6 +27,11 @@ type Record struct {
 	App string `gorm:"type:varchar(64)"`
 	// stream dir
 	Stream string `gorm:"type:varchar(64)"`
+	// 状态
+	// ready 录像完成
+	// uploaded 已上传
+	// submitted 已提交
+	Status string `gorm:"not null"`
 }
 
 // GetRecordList 获取指定数量的数据
