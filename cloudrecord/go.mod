@@ -5,8 +5,8 @@ go 1.20
 require (
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-playground/validator/v10 v10.14.0
-	github.com/qq51529210/log v0.0.0-20230526172650-387f141ef609
-	github.com/qq51529210/util v0.0.0-20230526173039-39041e11369b
+	github.com/qq51529210/log v0.0.0-20230526043400-1ddf706dd0df
+	github.com/qq51529210/util v0.0.0-20230530131958-b5724b4f5af2
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.1
@@ -15,7 +15,7 @@ require (
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
-	github.com/bytedance/sonic v1.9.0 // indirect
+	github.com/bytedance/sonic v1.9.1 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect

@@ -30,11 +30,11 @@ type cfgZLM struct {
 
 // cfg 用于加载启动配置
 type cfg struct {
-	Name string   `json:"name" yaml:"name" validate:"required"`
-	Port int      `json:"port" yaml:"port" validate:"required,min=1"`
-	Log  util.Log `json:"log" yaml:"log"`
-	DB   cfgDB    `json:"db" yaml:"db"`
-	ZLM  cfgZLM   `json:"zlm" yaml:"zlm"`
+	Name string      `json:"name" yaml:"name" validate:"required"`
+	Port int         `json:"port" yaml:"port" validate:"required,min=1"`
+	Log  util.LogCfg `json:"log" yaml:"log"`
+	DB   cfgDB       `json:"db" yaml:"db"`
+	ZLM  cfgZLM      `json:"zlm" yaml:"zlm"`
 }
 
 // loadCfg 加载配置
