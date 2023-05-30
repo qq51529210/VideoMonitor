@@ -1,10 +1,10 @@
 name: record-plan-service-1
 port: 8001
 log:
- dir: log
+ rootDir: log
  maxFileSize: 10M
- maxKeepDay: 2.5
- syncInterval: 1000
+ maxKeepDay: 1
+ syncInterval: 5000
  std: out
  disableLevel:
 db:

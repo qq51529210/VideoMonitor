@@ -20,20 +20,20 @@ type patchReq struct {
 	Enable *int8 `json:"enable" binding:"omitempty,oneof=0 1"`
 	// 一周的时间数组
 	Peroids [][]*db.TimePeroid `json:"peroids" binding:"omitempty,min=1,max=7,dive,required,min=1,dive"`
-	// 自定义的数据
-	Data *string `json:"data" binding:"omitempty"`
+	// 保存的天数
+	SaveDay *int16 `json:"saveDay" binding:"omitempty,min=1"`
 }
 
-// @Summary	修改
-// @Tags		周计划
-// @Param		id		path	string		true	"WeekPlan.ID"
-// @Param		data	body	patchReq	true	"数据"
-// @Accept		json
-// @Produce	json
-// @Success	201	{object}	internal.RowResult
-// @Failure	400	{object}	internal.Error
-// @Failure	500	{object}	internal.Error
-// @Router		/week_plans/{id} [patch]
+//	@Summary	修改
+//	@Tags		周计划
+//	@Param		id		path	string		true	"WeekPlan.ID"
+//	@Param		data	body	patchReq	true	"数据"
+//	@Accept		json
+//	@Produce	json
+//	@Success	201	{object}	internal.RowResult
+//	@Failure	400	{object}	internal.Error
+//	@Failure	500	{object}	internal.Error
+//	@Router		/week_plans/{id} [patch]
 func patch(ctx *gin.Context) {
 	// 参数
 	var id internal.IDPath[string]

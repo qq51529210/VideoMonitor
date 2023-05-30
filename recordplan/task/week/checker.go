@@ -149,10 +149,10 @@ func (c *checker) concurrencyCheckRoutine(now *time.Time, wps []*weekplan) {
 	}
 }
 
-// startCallback 调用 id 关联的所有 task 的 StartCallback
+// startCallback 调用 id 关联的所有 stream 的 StartCallback
 func (c *checker) startCallback(wp *weekplan) {
-	for _, task := range wp.allTask() {
-		err := util.HTTP[int, int](http.MethodGet, *task.StartCallback, nil, nil, nil, http.StatusOK, c.apiCallTimeout)
+	for _, stream := range wp.allStream() {
+		err := util.HTTP[int, int](http.MethodGet, *stream.StartCallback, nil, nil, nil, http.StatusOK, c.apiCallTimeout)
 		if err != nil {
 			if code, ok := err.(util.HTTPStatusError); ok {
 				// 没有这个流了，移除
@@ -160,15 +160,15 @@ func (c *checker) startCallback(wp *weekplan) {
 					continue
 				}
 			}
-			log.Errorf("week plan %s start callback task %s error: %s", wp.id, task.TaskID, err.Error())
+			log.Errorf("week plan %s start callback stream %s error: %s", wp.id, stream.Stream, err.Error())
 		}
 	}
 }
 
-// stopCallback 调用 id 关联的所有 task 的 StartCallback
+// stopCallback 调用 id 关联的所有 stream 的 StartCallback
 func (c *checker) stopCallback(wp *weekplan) {
-	for _, task := range wp.allTask() {
-		err := util.HTTP[int, int](http.MethodGet, *task.StopCallback, nil, nil, nil, http.StatusOK, c.apiCallTimeout)
+	for _, stream := range wp.allStream() {
+		err := util.HTTP[int, int](http.MethodGet, *stream.StopCallback, nil, nil, nil, http.StatusOK, c.apiCallTimeout)
 		if err != nil {
 			if code, ok := err.(util.HTTPStatusError); ok {
 				// 没有这个流了，移除
@@ -176,7 +176,7 @@ func (c *checker) stopCallback(wp *weekplan) {
 					continue
 				}
 			}
-			log.Errorf("week plan %s stop callback task %s error: %s", wp.id, task.TaskID, err.Error())
+			log.Errorf("week plan %s stop callback stream %s error: %s", wp.id, stream.Stream, err.Error())
 		}
 	}
 }

@@ -10,3 +10,6 @@
 # 计划类型
 目前只有周计划
 1. 周计划
+
+
+文档生成：swag init -o api/internal/docs --parseDependency

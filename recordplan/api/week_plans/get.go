@@ -9,14 +9,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Summary	详情
-// @Tags		周计划
-// @Param		id	path	string	true	"WeekPlan.ID"
-// @Produce	json
-// @Success	200	{object}	db.WeekPlan
-// @Failure	404	{object}	internal.Error
-// @Failure	500	{object}	internal.Error
-// @Router		/week_plans/{id} [get]
+//	@Summary	详情
+//	@Tags		周计划
+//	@Param		id	path	string	true	"WeekPlan.ID"
+//	@Produce	json
+//	@Success	200	{object}	db.WeekPlan
+//	@Failure	404	{object}	internal.Error
+//	@Failure	500	{object}	internal.Error
+//	@Router		/week_plans/{id} [get]
 func get(ctx *gin.Context) {
 	// 参数
 	var id internal.IDPath[string]

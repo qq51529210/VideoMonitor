@@ -27,7 +27,7 @@ type weekplan struct {
 	// 是否在录像时间
 	isRecording bool
 	// 关联的流
-	task []*db.WeekPlanTask
+	task []*db.WeekPlanStream
 	// task 数据是否有效
 	taskOK bool
 }
@@ -47,12 +47,12 @@ func (p *weekplan) init(model *db.WeekPlan) {
 		}
 		p.peroids = append(p.peroids, peroids)
 	}
-	p.initTask()
+	p.initStream()
 }
 
-func (p *weekplan) initTask() {
+func (p *weekplan) initStream() {
 	// 查询
-	models, err := db.GetWeekPlanTaskByPlanID(p.id)
+	models, err := db.GetWeekPlanStreamByPlanID(p.id)
 	if err != nil {
 		log.ErrorfDepth(1, "load week plan %s task error: %s", p.id, err.Error())
 	}
@@ -61,10 +61,10 @@ func (p *weekplan) initTask() {
 	p.taskOK = true
 }
 
-func (p *weekplan) allTask() []*db.WeekPlanTask {
+func (p *weekplan) allStream() []*db.WeekPlanStream {
 	// 数据不正常，加载
 	if !p.taskOK {
-		p.initTask()
+		p.initStream()
 	}
 	return p.task
 }

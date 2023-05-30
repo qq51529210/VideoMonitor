@@ -1,15 +1,4 @@
 definitions:
-  db.ListData-db_WeekPlan:
-    properties:
-      data:
-        description: 列表
-        items:
-          $ref: '#/definitions/db.WeekPlan'
-        type: array
-      total:
-        description: 总数
-        type: integer
-    type: object
   db.TimePeroid:
     properties:
       end:
@@ -21,12 +10,6 @@ definitions:
     type: object
   db.WeekPlan:
     properties:
-      createdAt:
-        description: 数据库的创建时间，时间戳，
-        type: integer
-      data:
-        description: 保存的天数
-        type: string
       enable:
         description: |-
           是否禁用
@@ -34,7 +17,6 @@ definitions:
           1: 启用
         type: integer
       id:
-        description: 数据库ID
         type: string
       name:
         description: 名称
@@ -42,8 +24,8 @@ definitions:
       peroids:
         description: 是一个 RecordTime 的 JSON 数组
         type: string
-      updatedAt:
-        description: 数据库的更新时间
+      saveDay:
+        description: 保存的天数
         type: integer
     type: object
   internal.Error:
@@ -66,11 +48,8 @@ definitions:
         description: 行数
         type: integer
     type: object
-  tasks.tasks:
+  streams.stream:
     properties:
-      id:
-        description: 流的唯一标识
-        type: string
       startCallback:
         description: 开始录像回调
         maxLength: 255
@@ -79,16 +58,28 @@ definitions:
         description: 停止录像回调
         maxLength: 255
         type: string
+      stream:
+        description: 流的唯一标识
+        maxLength: 128
+        type: string
     required:
-    - id
     - startCallback
     - stopCallback
+    - stream
+    type: object
+  util.GORMList-db_WeekPlan:
+    properties:
+      data:
+        description: 列表
+        items:
+          $ref: '#/definitions/db.WeekPlan'
+        type: array
+      total:
+        description: 总数
+        type: integer
     type: object
   weekplans.patchReq:
     properties:
-      data:
-        description: 附加的数据
-        type: string
       enable:
         description: |-
           是否禁用
@@ -111,14 +102,15 @@ definitions:
         maxItems: 7
         minItems: 1
         type: array
+      saveDay:
+        description: 保存的天数
+        minimum: 1
+        type: integer
     required:
     - peroids
     type: object
   weekplans.postReq:
     properties:
-      data:
-        description: 附加的数据
-        type: string
       enable:
         description: |-
           是否禁用，默认是 1
@@ -141,6 +133,10 @@ definitions:
         maxItems: 7
         minItems: 1
         type: array
+      saveDay:
+        description: 保存的天数
+        minimum: 1
+        type: integer
     required:
     - name
     - peroids
@@ -150,6 +146,34 @@ info:
   title: 接口文档
   version: 1.0.0
 paths:
+  /streams/{stream}/week_plans:
+    get:
+      parameters:
+      - description: Stream
+        in: path
+        name: stream
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.WeekPlan'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal.Error'
+      summary: 获取周计划
+      tags:
+      - 媒体流
   /week_plans:
     delete:
       consumes:
@@ -187,24 +211,6 @@ paths:
       - 周计划
     get:
       parameters:
-      - description: 创建时间，时间戳，范围匹配，CreatedAt >= CreatedAtAfter
-        in: query
-        minimum: 0
-        name: afterCreatedAt
-        type: integer
-      - description: 更新时间，时间戳，范围匹配，UpdateAt >= UpdatedAtAfter
-        in: query
-        minimum: 0
-        name: afterUpdatedAt
-        type: integer
-      - description: 创建时间，时间戳，范围匹配，CreatedAt < CreatedBefore
-        in: query
-        name: beforeCreatedAt
-        type: integer
-      - description: 更新时间，时间戳，范围匹配，UpdateAt < UpdatedAtBefore
-        in: query
-        name: beforeUpdatedAt
-        type: integer
       - description: 条数，小于 1 不匹配
         in: query
         minimum: 1
@@ -231,13 +237,18 @@ paths:
         in: query
         name: order
         type: string
+      - description: 保存的天数
+        in: query
+        minimum: 1
+        name: saveDay
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/db.ListData-db_WeekPlan'
+            $ref: '#/definitions/util.GORMList-db_WeekPlan'
         "400":
           description: Bad Request
           schema:
@@ -359,7 +370,7 @@ paths:
       summary: 修改
       tags:
       - 周计划
-  /week_plans/{id}/tasks:
+  /week_plans/{id}/streams:
     delete:
       consumes:
       - application/json
@@ -388,7 +399,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/internal.Error'
-      summary: 删除任务
+      summary: 解绑媒体流
       tags:
       - 周计划
     put:
@@ -406,7 +417,7 @@ paths:
         required: true
         schema:
           items:
-            $ref: '#/definitions/tasks.tasks'
+            $ref: '#/definitions/streams.stream'
           type: array
       produces:
       - application/json
@@ -423,7 +434,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/internal.Error'
-      summary: 添加任务
+      summary: 绑定媒体流
       tags:
       - 周计划
 swagger: "2.0"

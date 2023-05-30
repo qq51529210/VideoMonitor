@@ -6,7 +6,7 @@ require (
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-playground/validator/v10 v10.14.0
 	github.com/qq51529210/log v0.0.0-20230527063400-17df706dd0df
-	github.com/qq51529210/util v0.0.0-20230529154101-c6059f251548
+	github.com/qq51529210/util v0.0.0-20230529144015-5650cd72cd18
 	github.com/qq51529210/uuid v0.0.0-20230116075911-debb68a3e58d
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0

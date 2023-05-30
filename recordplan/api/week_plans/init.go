@@ -2,7 +2,7 @@ package weekplans
 
 import (
 	"encoding/json"
-	"recordplan/api/week_plans/tasks"
+	"recordplan/api/week_plans/streams"
 	"recordplan/db"
 	"strings"
 
@@ -20,7 +20,7 @@ func Init(router gin.IRouter) {
 	router.DELETE("/:id", delete)
 	router.DELETE("/", batchDelete)
 	//
-	tasks.Init(router.Group("/:id"))
+	streams.Init(router.Group("/:id"))
 }
 
 func jsonTimePeroid(peroids [][]*db.TimePeroid) *string {

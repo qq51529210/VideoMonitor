@@ -9,7 +9,6 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	"recordplan/api/callbacks"
 	"recordplan/api/internal/docs"
 	weekplans "recordplan/api/week_plans"
 
@@ -56,7 +55,6 @@ func (s *server) initRouter() {
 	s.gin.Use(global)
 	// 路由
 	weekplans.Init(s.gin)
-	callbacks.Init(s.gin)
 }
 
 // 全局第一个中间件

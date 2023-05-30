@@ -16,6 +16,49 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/streams/{stream}/week_plans": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "媒体流"
+                ],
+                "summary": "获取周计划",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Stream",
+                        "name": "stream",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.WeekPlan"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/internal.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/week_plans": {
             "get": {
                 "produces": [
@@ -26,32 +69,6 @@ const docTemplate = `{
                 ],
                 "summary": "列表",
                 "parameters": [
-                    {
-                        "minimum": 0,
-                        "type": "integer",
-                        "description": "创建时间，时间戳，范围匹配，CreatedAt \u003e= CreatedAtAfter",
-                        "name": "afterCreatedAt",
-                        "in": "query"
-                    },
-                    {
-                        "minimum": 0,
-                        "type": "integer",
-                        "description": "更新时间，时间戳，范围匹配，UpdateAt \u003e= UpdatedAtAfter",
-                        "name": "afterUpdatedAt",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "创建时间，时间戳，范围匹配，CreatedAt \u003c CreatedBefore",
-                        "name": "beforeCreatedAt",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "更新时间，时间戳，范围匹配，UpdateAt \u003c UpdatedAtBefore",
-                        "name": "beforeUpdatedAt",
-                        "in": "query"
-                    },
                     {
                         "minimum": 1,
                         "type": "integer",
@@ -88,13 +105,20 @@ const docTemplate = `{
                         "description": "排序，\"column [desc]\"",
                         "name": "order",
                         "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "保存的天数",
+                        "name": "saveDay",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/db.ListData-db_WeekPlan"
+                            "$ref": "#/definitions/util.GORMList-db_WeekPlan"
                         }
                     },
                     "400": {
@@ -334,7 +358,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/week_plans/{id}/tasks": {
+        "/week_plans/{id}/streams": {
             "put": {
                 "consumes": [
                     "application/json"
@@ -345,7 +369,7 @@ const docTemplate = `{
                 "tags": [
                     "周计划"
                 ],
-                "summary": "添加任务",
+                "summary": "绑定媒体流",
                 "parameters": [
                     {
                         "type": "string",
@@ -362,7 +386,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/tasks.tasks"
+                                "$ref": "#/definitions/streams.stream"
                             }
                         }
                     }
@@ -395,7 +419,7 @@ const docTemplate = `{
                 "tags": [
                     "周计划"
                 ],
-                "summary": "删除任务",
+                "summary": "解绑媒体流",
                 "parameters": [
                     {
                         "type": "string",
@@ -438,22 +462,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "db.ListData-db_WeekPlan": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "description": "列表",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/db.WeekPlan"
-                    }
-                },
-                "total": {
-                    "description": "总数",
-                    "type": "integer"
-                }
-            }
-        },
         "db.TimePeroid": {
             "type": "object",
             "properties": {
@@ -470,20 +478,11 @@ const docTemplate = `{
         "db.WeekPlan": {
             "type": "object",
             "properties": {
-                "createdAt": {
-                    "description": "数据库的创建时间，时间戳，",
-                    "type": "integer"
-                },
-                "data": {
-                    "description": "保存的天数",
-                    "type": "string"
-                },
                 "enable": {
                     "description": "是否禁用\n0: 禁用\n1: 启用",
                     "type": "integer"
                 },
                 "id": {
-                    "description": "数据库ID",
                     "type": "string"
                 },
                 "name": {
@@ -494,8 +493,8 @@ const docTemplate = `{
                     "description": "是一个 RecordTime 的 JSON 数组",
                     "type": "string"
                 },
-                "updatedAt": {
-                    "description": "数据库的更新时间",
+                "saveDay": {
+                    "description": "保存的天数",
                     "type": "integer"
                 }
             }
@@ -530,18 +529,14 @@ const docTemplate = `{
                 }
             }
         },
-        "tasks.tasks": {
+        "streams.stream": {
             "type": "object",
             "required": [
-                "id",
                 "startCallback",
-                "stopCallback"
+                "stopCallback",
+                "stream"
             ],
             "properties": {
-                "id": {
-                    "description": "流的唯一标识",
-                    "type": "string"
-                },
                 "startCallback": {
                     "description": "开始录像回调",
                     "type": "string",
@@ -551,6 +546,27 @@ const docTemplate = `{
                     "description": "停止录像回调",
                     "type": "string",
                     "maxLength": 255
+                },
+                "stream": {
+                    "description": "流的唯一标识",
+                    "type": "string",
+                    "maxLength": 128
+                }
+            }
+        },
+        "util.GORMList-db_WeekPlan": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "列表",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/db.WeekPlan"
+                    }
+                },
+                "total": {
+                    "description": "总数",
+                    "type": "integer"
                 }
             }
         },
@@ -560,10 +576,6 @@ const docTemplate = `{
                 "peroids"
             ],
             "properties": {
-                "data": {
-                    "description": "附加的数据",
-                    "type": "string"
-                },
                 "enable": {
                     "description": "是否禁用\n0: 禁用\n1: 启用",
                     "type": "integer",
@@ -588,6 +600,11 @@ const docTemplate = `{
                             "$ref": "#/definitions/db.TimePeroid"
                         }
                     }
+                },
+                "saveDay": {
+                    "description": "保存的天数",
+                    "type": "integer",
+                    "minimum": 1
                 }
             }
         },
@@ -598,10 +615,6 @@ const docTemplate = `{
                 "peroids"
             ],
             "properties": {
-                "data": {
-                    "description": "附加的数据",
-                    "type": "string"
-                },
                 "enable": {
                     "description": "是否禁用，默认是 1\n0: 禁用\n1: 启用",
                     "type": "integer",
@@ -626,6 +639,11 @@ const docTemplate = `{
                             "$ref": "#/definitions/db.TimePeroid"
                         }
                     }
+                },
+                "saveDay": {
+                    "description": "保存的天数",
+                    "type": "integer",
+                    "minimum": 1
                 }
             }
         }

@@ -46,12 +46,12 @@ func initDB(uri string) (*gorm.DB, error) {
 func initTable(db *gorm.DB) error {
 	return db.AutoMigrate(
 		&WeekPlan{},
-		&WeekPlanTask{},
+		&WeekPlanStream{},
 	)
 }
 
 // initDA 创建各个数据访问
 func initDA(db *gorm.DB, cache bool) {
 	initWeekPlanDA(db, cache)
-	initWeekPlanTaskDA(db, cache)
+	initWeekPlanStreamDA(db, cache)
 }
