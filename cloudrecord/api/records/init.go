@@ -11,7 +11,6 @@ func Init(router gin.IRouter) {
 	router.GET("/", list)
 	router.GET("/:id", get)
 	router.POST("/", post)
-	// router.PATCH("/:id", patch)
 	router.DELETE("/:id", delete)
 	router.DELETE("/", batchDelete)
 }

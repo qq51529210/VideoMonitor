@@ -10,15 +10,12 @@ definitions:
       duration:
         description: 时长，单位秒
         type: number
-      id:
-        description: 名称
-        type: string
       isDeleted:
         description: 软删除
         type: integer
-      isRecording:
-        description: 是否在录像时间内的文件
-        type: integer
+      name:
+        description: minio 标识
+        type: string
       size:
         description: 大小，字节
         type: integer
@@ -34,37 +31,20 @@ definitions:
         description: 简短信息
         type: string
     type: object
-  internal.IDResult-string:
-    properties:
-      id:
-        description: 数据库 ID
-        type: string
-    type: object
   records.postReq:
     properties:
-      app:
-        description: app
-        maxLength: 64
-        type: string
-      createTime:
-        description: 创建时间
-        minimum: 1
+      deleteTime:
+        description: 删除时间
+        minimum: 0
         type: integer
       duration:
         description: 时长
         minimum: 1
         type: number
-      isRecording:
-        description: 是否在录像时间内
-        type: boolean
       name:
         description: minio 的标识
         maxLength: 40
         type: string
-      saveDays:
-        description: 保存天数
-        minimum: 0
-        type: integer
       size:
         description: 大小
         minimum: 1
@@ -73,14 +53,17 @@ definitions:
         description: stream
         maxLength: 64
         type: string
+      time:
+        description: 创建时间
+        minimum: 1
+        type: integer
     required:
-    - app
-    - createTime
+    - deleteTime
     - duration
     - name
-    - saveDays
     - size
     - stream
+    - time
     type: object
   util.GORMList-db_Record:
     properties:
@@ -195,8 +178,6 @@ paths:
       responses:
         "201":
           description: Created
-          schema:
-            $ref: '#/definitions/internal.IDResult-string'
         "400":
           description: Bad Request
           schema:
@@ -234,9 +215,9 @@ paths:
       - 云端录像
     get:
       parameters:
-      - description: 主键
+      - description: Record.Name
         in: path
-        name: id
+        name: name
         required: true
         type: string
       produces:

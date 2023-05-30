@@ -6,19 +6,13 @@ import (
 )
 
 var (
-	record util.GORMDB[string, *Record]
-	//
-	AddRecord         = record.Add
-	DeleteRecord      = record.Delete
-	BatchDeleteRecord = record.BatchDelete
-	GetRecord         = record.Get
-	GetRecordList     = record.List
+	RecordDA util.GORMDB[string, *Record]
 )
 
 // Record 表示录像信息
 type Record struct {
-	// 名称
-	ID string `json:"id" gorm:"type:varchar(40);primaryKey"`
+	// minio 标识
+	Name string `json:"name" gorm:"type:varchar(40);primaryKey"`
 	// stream
 	Stream string `json:"stream" gorm:"type:varchar(64)"`
 	// 大小，字节
@@ -29,10 +23,10 @@ type Record struct {
 	Time int64 `json:"createTime" gorm:""`
 	// 删除时间戳
 	DeleteTime int64 `json:"deleteTime" gorm:""`
-	// 是否在录像时间内的文件
-	IsRecording *int8 `json:"isRecording" gorm:""`
 	// 软删除
 	IsDeleted *int8 `json:"isDeleted" gorm:"not null;default:0"`
+	// 是否在录像时间内的文件
+	// IsRecording *int8 `json:"isRecording" gorm:""`
 	// app
 	// App string `json:"app" gorm:"type:varchar(64)"`
 }

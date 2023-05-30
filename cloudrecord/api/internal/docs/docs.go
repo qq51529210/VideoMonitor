@@ -111,10 +111,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/internal.IDResult-string"
-                        }
+                        "description": "Created"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -197,8 +194,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "主键",
-                        "name": "id",
+                        "description": "Record.Name",
+                        "name": "name",
                         "in": "path",
                         "required": true
                     }
@@ -277,17 +274,13 @@ const docTemplate = `{
                     "description": "时长，单位秒",
                     "type": "number"
                 },
-                "id": {
-                    "description": "名称",
-                    "type": "string"
-                },
                 "isDeleted": {
                     "description": "软删除",
                     "type": "integer"
                 },
-                "isRecording": {
-                    "description": "是否在录像时间内的文件",
-                    "type": "integer"
+                "name": {
+                    "description": "minio 标识",
+                    "type": "string"
                 },
                 "size": {
                     "description": "大小，字节",
@@ -311,55 +304,31 @@ const docTemplate = `{
                 }
             }
         },
-        "internal.IDResult-string": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "description": "数据库 ID",
-                    "type": "string"
-                }
-            }
-        },
         "records.postReq": {
             "type": "object",
             "required": [
-                "app",
-                "createTime",
+                "deleteTime",
                 "duration",
                 "name",
-                "saveDays",
                 "size",
-                "stream"
+                "stream",
+                "time"
             ],
             "properties": {
-                "app": {
-                    "description": "app",
-                    "type": "string",
-                    "maxLength": 64
-                },
-                "createTime": {
-                    "description": "创建时间",
+                "deleteTime": {
+                    "description": "删除时间",
                     "type": "integer",
-                    "minimum": 1
+                    "minimum": 0
                 },
                 "duration": {
                     "description": "时长",
                     "type": "number",
                     "minimum": 1
                 },
-                "isRecording": {
-                    "description": "是否在录像时间内",
-                    "type": "boolean"
-                },
                 "name": {
                     "description": "minio 的标识",
                     "type": "string",
                     "maxLength": 40
-                },
-                "saveDays": {
-                    "description": "保存天数",
-                    "type": "integer",
-                    "minimum": 0
                 },
                 "size": {
                     "description": "大小",
@@ -370,6 +339,11 @@ const docTemplate = `{
                     "description": "stream",
                     "type": "string",
                     "maxLength": 64
+                },
+                "time": {
+                    "description": "创建时间",
+                    "type": "integer",
+                    "minimum": 1
                 }
             }
         },

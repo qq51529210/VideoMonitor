@@ -9,13 +9,9 @@ import (
 	"github.com/qq51529210/util"
 )
 
-const (
-	dayDuration = 24 * 3600
-)
-
 type postReq struct {
 	// minio 的标识
-	ID string `json:"name" binding:"required,max=40"`
+	Name string `json:"name" binding:"required,max=40"`
 	// stream
 	Stream string `json:"stream" binding:"required,max=64"`
 	// 大小
@@ -24,23 +20,19 @@ type postReq struct {
 	Duration float64 ` json:"duration" binding:"required,min=1"`
 	// 创建时间
 	Time int64 `json:"time" binding:"required,min=1"`
-	// 保存天数
-	SaveDays int64 `json:"saveDays" binding:"required,min=0"`
-	// 是否在录像时间内
-	IsRecording bool `json:"isRecording"`
-	// app
-	App string `json:"app" binding:"required,max=64"`
+	// 删除时间
+	DeleteTime int64 `json:"deleteTime" binding:"required,min=0"`
 }
 
-// @Summary	添加
-// @Tags		云端录像
-// @Param		data	body	postReq	true	"数据"
-// @Accept		json
-// @Produce	json
-// @Success	201	{object}	internal.IDResult[string]
-// @Failure	400	{object}	internal.Error
-// @Failure	500	{object}	internal.Error
-// @Router		/records [post]
+//	@Summary	添加
+//	@Tags		云端录像
+//	@Param		data	body	postReq	true	"数据"
+//	@Accept		json
+//	@Produce	json
+//	@Success	201
+//	@Failure	400	{object}	internal.Error
+//	@Failure	500	{object}	internal.Error
+//	@Router		/records [post]
 func post(ctx *gin.Context) {
 	// 参数
 	var req postReq
@@ -52,17 +44,11 @@ func post(ctx *gin.Context) {
 	// 数据库
 	var model db.Record
 	util.CopyStruct(&model, &req)
-	model.DeleteTime = req.Time + dayDuration*req.SaveDays
-	if req.IsRecording {
-		model.IsDeleted = &db.Enable
-	}
-	_, err = db.AddRecord(&model)
+	_, err = db.RecordDA.Add(&model)
 	if err != nil {
 		internal.HandleDB500(ctx, err)
 		return
 	}
 	// 返回
-	ctx.JSON(http.StatusCreated, &internal.IDResult[string]{
-		ID: model.ID,
-	})
+	ctx.Status(http.StatusCreated)
 }

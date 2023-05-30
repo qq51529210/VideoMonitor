@@ -10,7 +10,7 @@ import (
 
 //	@Summary	详情
 //	@Tags		云端录像
-//	@Param		id	path	string	true	"主键"
+//	@Param		name	path	string	true	"Record.Name"
 //	@Produce	json
 //	@Success	200	{object}	db.Record
 //	@Failure	404	{object}	internal.Error
@@ -26,8 +26,7 @@ func get(ctx *gin.Context) {
 	}
 	// 数据库
 	var model db.Record
-	model.ID = id.ID
-	ok, err := db.GetRecord(&model)
+	ok, err := db.RecordDA.Get(&model)
 	if err != nil {
 		internal.HandleDB500(ctx, err)
 		return

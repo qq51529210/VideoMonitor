@@ -25,7 +25,7 @@ func delete(ctx *gin.Context) {
 		return
 	}
 	// 数据库
-	_, err = db.DeleteRecord(id.ID)
+	_, err = db.RecordDA.Delete(id.ID)
 	if err != nil {
 		internal.HandleDB500(ctx, err)
 		return
@@ -55,7 +55,7 @@ func batchDelete(ctx *gin.Context) {
 		return
 	}
 	// 数据库
-	_, err = db.BatchDeleteRecord(req.ID)
+	_, err = db.RecordDA.BatchDelete(req.ID)
 	if err != nil {
 		internal.HandleDB500(ctx, err)
 		return

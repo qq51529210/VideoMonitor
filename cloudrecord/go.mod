@@ -60,8 +60,3 @@ require (
 	modernc.org/memory v1.5.0 // indirect
 	modernc.org/sqlite v1.22.1 // indirect
 )
-
-replace (
-	github.com/qq51529210/log => D:\project\go\log
-	github.com/qq51529210/util => D:\project\go\util
-)

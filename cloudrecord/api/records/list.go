@@ -27,7 +27,7 @@ func list(ctx *gin.Context) {
 	}
 	// 数据库
 	var res util.GORMList[*db.Record]
-	err = db.GetRecordList(&req, &req.GORMPage, &res)
+	err = db.RecordDA.List(&req.GORMPage, &req, &res)
 	if err != nil {
 		internal.HandleDB500(ctx, err)
 		return

@@ -133,10 +133,10 @@ github.com/pelletier/go-toml/v2/internal/characters
 github.com/pelletier/go-toml/v2/internal/danger
 github.com/pelletier/go-toml/v2/internal/tracker
 github.com/pelletier/go-toml/v2/unstable
-# github.com/qq51529210/log v0.0.0-20230527063400-17df706dd0df => D:\project\go\log
+# github.com/qq51529210/log v0.0.0-20230527063400-17df706dd0df
 ## explicit; go 1.20
 github.com/qq51529210/log
-# github.com/qq51529210/util v0.0.0-20230530131958-b572434f9af4 => D:\project\go\util
+# github.com/qq51529210/util v0.0.0-20230530131958-b572434f9af4
 ## explicit; go 1.19
 github.com/qq51529210/util
 # github.com/qq51529210/uuid v0.0.0-20230116075911-debb68a3e58d
@@ -282,5 +282,3 @@ modernc.org/memory
 # modernc.org/sqlite v1.22.1
 ## explicit; go 1.18
 modernc.org/sqlite/lib
-# github.com/qq51529210/log => D:\project\go\log
-# github.com/qq51529210/util => D:\project\go\util

@@ -45,5 +45,5 @@ func initTable(db *gorm.DB) error {
 
 // initDA 创建各个数据访问
 func initDA(db *gorm.DB) {
-	record.Init(db, new(Record))
+	RecordDA.Init(db, new(Record))
 }

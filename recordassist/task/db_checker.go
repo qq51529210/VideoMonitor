@@ -12,6 +12,10 @@ import (
 	"github.com/qq51529210/util"
 )
 
+const (
+	dayDuration = 24 * 3600
+)
+
 var (
 	_dbChecker dbChecker
 )
@@ -221,26 +225,27 @@ func (c *dbChecker) getRecordSaveDay(stream string) (int64, error) {
 }
 
 type postRecordReq struct {
-	// 创建时间
-	Time int64 `json:"time"`
-	// 时长
-	Duration float64 ` json:"duration"`
-	// 大小
-	Size int64 `json:"size"`
-	// 存储的地址
-	Name string `json:"name"`
+	// minio 的标识
+	Name string `json:"name" binding:"required,max=40"`
 	// stream
-	Stream string `json:"stream"`
-	// 保存天数
-	SaveDays int64 `json:"saveDays"`
-	// 是否在录像时间内
-	IsRecording bool `json:"isRecording"`
+	Stream string `json:"stream" binding:"required,max=64"`
+	// 大小
+	Size int64 `json:"size" binding:"required,min=1"`
+	// 时长
+	Duration float64 ` json:"duration" binding:"required,min=1"`
+	// 创建时间
+	Time int64 `json:"time" binding:"required,min=1"`
+	// 删除时间
+	DeleteTime int64 `json:"deleteTime" binding:"required,min=0"`
 }
 
 func (c *dbChecker) postRecord(model *db.Record, stream string, saveDay int64) error {
 	var postReq postRecordReq
-	util.CopyStruct(&postReq, model)
+	postReq.Name = model.Name
 	postReq.Stream = stream
-	postReq.SaveDays = saveDay
-	return util.HTTP[postRecordReq, any](http.MethodPost, c.apiGetSaveDaysURL, nil, &postReq, nil, http.StatusCreated, c.apiCallTimeout)
+	postReq.Size = model.Size
+	postReq.Duration = model.Duration
+	postReq.Time = model.Time
+	postReq.DeleteTime = model.Time + saveDay*dayDuration
+	return util.HTTP[postRecordReq, any](http.MethodPost, c.apiPostRecordURL, nil, &postReq, nil, http.StatusCreated, c.apiCallTimeout)
 }
