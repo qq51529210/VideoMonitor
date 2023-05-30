@@ -13,6 +13,11 @@ func Reload(id string) {
 	go _checker.loadRoutine(id)
 }
 
+// DeleteStream 移除所有计划的 stream ，再删除 stream 后调用
+func DeleteStream(stream string) {
+	_checker.removeStream(stream)
+}
+
 // IsRecording 返回指定 id 的录像是否在录像时间段。
 // 再查询出关联的 stream ，就可以知道 stream 是否需要录像。
 // 如果 id 不存在，返回 ErrNotFound

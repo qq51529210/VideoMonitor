@@ -140,7 +140,7 @@ func (c *checker) concurrencyCheckRoutine(now *time.Time, wps []*weekplan) {
 		wp.isRecording = needRecord
 		// 需要录像，调用回调
 		// todo 考虑一下，是否需要判断回调成功后停止
-		// 如果这样，对方系统在这段时间出问题，就不能再触发或者停止任务了
+		// 如果这样，对方系统在这段时间出问题，就不能再触发或者停止媒体流了
 		if wp.isRecording {
 			c.startCallback(wp)
 		} else {
@@ -232,4 +232,23 @@ func (c *checker) add(model *db.WeekPlan) {
 	c.Unlock()
 	// 初始化
 	p.init(model)
+}
+
+// removeStream 遍历所有的计划删除
+func (c *checker) removeStream(stream string) {
+	// 上锁
+	c.Lock()
+	defer c.Unlock()
+	// 查找
+	for _, v := range c.weekplan {
+		if !v.streamOK {
+			continue
+		}
+		for i := 0; i < len(v.stream); i++ {
+			if v.stream[i].Stream == stream {
+				v.stream = append(v.stream[:i], v.stream[i+1:]...)
+				break
+			}
+		}
+	}
 }

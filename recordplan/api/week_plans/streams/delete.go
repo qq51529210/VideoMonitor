@@ -12,7 +12,7 @@ import (
 //	@Summary	解绑媒体流
 //	@Tags		周计划
 //	@Param		id		path	string		true	"WeekPlan.ID"
-//	@Param		data	body	[]string	true	"自定义的任务 ID 数组"
+//	@Param		data	body	[]string	true	"自定义的媒体流 ID 数组"
 //	@Accept		json
 //	@Success	204
 //	@Failure	400	{object}	internal.Error

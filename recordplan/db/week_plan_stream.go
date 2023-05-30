@@ -42,13 +42,13 @@ func initWeekPlanStreamDA(db *gorm.DB, cache bool) {
 }
 
 type WeekPlanStreamKey struct {
-	// 用于查询，最大 128 个字符
+	// 用于查询，最大 64 个字符
 	Stream string `json:"stream" gorm:"primaryKey;type:varchar(64)"`
 	// WeekPlan.ID
 	WeekPlanID string `json:"weekPlanID" gorm:"primaryKey;type:varchar(32)"`
 }
 
-// WeekPlan 表示周计划任务
+// WeekPlan 表示周计划媒体流
 // Stream 和 WeekPlanID 是多对多的关系
 type WeekPlanStream struct {
 	WeekPlanStreamKey
@@ -116,15 +116,30 @@ func DeleteWeekPlanStreamByStream(stream string) (int64, error) {
 		return db.RowsAffected, db.Error
 	}
 	// 缓存
+	WeekPlanStreamDA.BatchDeleteCache(func(m *WeekPlanStream) bool {
+		return m.Stream == stream
+	})
+	//
+	return db.RowsAffected, db.Error
+}
+
+// BatchDeleteWeekPlanStreamByStream 批量删除指定 streams
+func BatchDeleteWeekPlanStreamByStream(streams []string) (int64, error) {
+	// 数据库
+	db := WeekPlanStreamDA.Model().Delete(streams, "`Stream` IN ?")
+	if db.Error != nil {
+		return db.RowsAffected, db.Error
+	}
+	// 缓存
 	if WeekPlanStreamDA.IsCache() {
-		// 上锁
-		WeekPlanStreamDA.Lock()
-		defer WeekPlanStreamDA.Unlock()
-		for k := range WeekPlanStreamDA.D {
-			if k.Stream == stream {
-				delete(WeekPlanStreamDA.D, k)
+		WeekPlanStreamDA.BatchDeleteCache(func(m *WeekPlanStream) bool {
+			for i := 0; i < len(streams); i++ {
+				if m.Stream == streams[i] {
+					return true
+				}
 			}
-		}
+			return false
+		})
 	}
 	//
 	return db.RowsAffected, db.Error

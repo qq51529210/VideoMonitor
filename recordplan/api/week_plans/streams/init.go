@@ -14,7 +14,7 @@ func Init(router gin.IRouter) {
 
 type stream struct {
 	// 流的唯一标识
-	Stream string `json:"stream" binding:"required,max=128"`
+	Stream string `json:"stream" binding:"required,max=64"`
 	// 开始录像回调
 	StartCallback *string `json:"startCallback" binding:"required,max=255"`
 	// 停止录像回调

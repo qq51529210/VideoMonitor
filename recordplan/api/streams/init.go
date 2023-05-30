@@ -8,7 +8,10 @@ import (
 
 // Init 初始化路由
 func Init(router gin.IRouter) {
-	router = router.Group("/streams/:stream")
+	router = router.Group("/streams")
 	//
-	weekplans.Init(router)
+	router.DELETE("/", batchDelete)
+	router.DELETE("/:stream", delete)
+	//
+	weekplans.Init(router.Group("/:stream"))
 }

@@ -16,6 +16,93 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/streams": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "媒体流"
+                ],
+                "summary": "批量删除",
+                "parameters": [
+                    {
+                        "description": "Stream 数组",
+                        "name": "stream",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/internal.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/streams/{stream}": {
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "媒体流"
+                ],
+                "summary": "删除",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Stream",
+                        "name": "stream",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/internal.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/streams/{stream}/week_plans": {
             "get": {
                 "produces": [
@@ -40,7 +127,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/db.WeekPlan"
+                                "$ref": "#/definitions/weekplans.weekplan"
                             }
                         }
                     },
@@ -218,12 +305,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/internal.Error"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -379,7 +460,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "任务数组",
+                        "description": "媒体流数组",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -429,7 +510,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "自定义的任务 ID 数组",
+                        "description": "自定义的媒体流 ID 数组",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -550,7 +631,7 @@ const docTemplate = `{
                 "stream": {
                     "description": "流的唯一标识",
                     "type": "string",
-                    "maxLength": 128
+                    "maxLength": 64
                 }
             }
         },
@@ -644,6 +725,33 @@ const docTemplate = `{
                     "description": "保存的天数",
                     "type": "integer",
                     "minimum": 1
+                }
+            }
+        },
+        "weekplans.weekplan": {
+            "type": "object",
+            "properties": {
+                "enable": {
+                    "description": "是否禁用\n0: 禁用\n1: 启用",
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "isRecording": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "description": "名称",
+                    "type": "string"
+                },
+                "peroids": {
+                    "description": "是一个 RecordTime 的 JSON 数组",
+                    "type": "string"
+                },
+                "saveDay": {
+                    "description": "保存的天数",
+                    "type": "integer"
                 }
             }
         }

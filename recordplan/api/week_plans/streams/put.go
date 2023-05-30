@@ -13,7 +13,7 @@ import (
 //	@Summary	绑定媒体流
 //	@Tags		周计划
 //	@Param		id		path	string		true	"WeekPlan.ID"
-//	@Param		data	body	[]stream	true	"任务数组"
+//	@Param		data	body	[]stream	true	"媒体流数组"
 //	@Accept		json
 //	@Produce	json
 //	@Success	201	{object}	internal.IDResult[int64]
