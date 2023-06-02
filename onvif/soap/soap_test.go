@@ -50,3 +50,15 @@ func Test_XML(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func Test_Security(t *testing.T) {
+	var sec Security
+	sec.Init("admin", "123123")
+	//
+	encoder := xml.NewEncoder(os.Stderr)
+	encoder.Indent("", "  ")
+	err := encoder.Encode(&sec)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
