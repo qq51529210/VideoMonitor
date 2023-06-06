@@ -1,12 +1,12 @@
-module cloudrecord
+module github.com/qq51529210/video-monitor/cloudrecord
 
 go 1.20
 
 require (
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-playground/validator/v10 v10.14.0
-	github.com/qq51529210/log v0.0.0-20230526043400-1ddf706dd0df
-	github.com/qq51529210/util v0.0.0-20230530131958-b5724b4f5af2
+	github.com/qq51529210/log v0.0.0-20230527063400-17df706dd0df
+	github.com/qq51529210/util v0.0.0-20230602172703-ff19eef858f1
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.1

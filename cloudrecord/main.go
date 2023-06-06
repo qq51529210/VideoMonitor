@@ -1,14 +1,14 @@
 package main
 
 import (
-	"cloudrecord/api"
-	"cloudrecord/db"
+	"github.com/qq51529210/video-monitor/cloudrecord/api"
+	"github.com/qq51529210/video-monitor/cloudrecord/db"
 
 	"github.com/qq51529210/log"
 )
 
-//	@Title		接口文档
-//	@version	1.0.0
+// @Title		接口文档
+// @version	1.0.0
 func main() {
 	defer func() {
 		log.Recover(recover())

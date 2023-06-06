@@ -64,9 +64,9 @@ type WeekPlanStream struct {
 // WeekPlanStreamQuery 是 WeekPlanStream 的查询参数
 type WeekPlanStreamQuery struct {
 	// ID，精确匹配
-	Stream string `form:"Stream" binding:"omitempty,min=1" gq:"eq=Stream"`
+	Stream *string `form:"Stream" binding:"omitempty,min=1" gq:"eq"`
 	// WeekPlan.ID，精确匹配
-	WeekPlanID string `form:"WeekPlanStream" binding:"omitempty,min=1" gq:"eq=WeekPlanID"`
+	WeekPlanID *string `form:"WeekPlanStream" binding:"omitempty,min=1" gq:"eq"`
 }
 
 // Init 实现 Query 接口

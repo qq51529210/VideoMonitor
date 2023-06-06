@@ -1,9 +1,10 @@
 package records
 
 import (
-	"cloudrecord/api/internal"
-	"cloudrecord/db"
 	"net/http"
+
+	"github.com/qq51529210/video-monitor/cloudrecord/api/internal"
+	"github.com/qq51529210/video-monitor/cloudrecord/db"
 
 	"github.com/gin-gonic/gin"
 	"github.com/qq51529210/util"
@@ -24,15 +25,15 @@ type postReq struct {
 	DeleteTime int64 `json:"deleteTime" binding:"required,min=0"`
 }
 
-//	@Summary	添加
-//	@Tags		云端录像
-//	@Param		data	body	postReq	true	"数据"
-//	@Accept		json
-//	@Produce	json
-//	@Success	201
-//	@Failure	400	{object}	internal.Error
-//	@Failure	500	{object}	internal.Error
-//	@Router		/records [post]
+// @Summary	添加
+// @Tags		云端录像
+// @Param		data	body	postReq	true	"数据"
+// @Accept		json
+// @Produce	json
+// @Success	201
+// @Failure	400	{object}	internal.Error
+// @Failure	500	{object}	internal.Error
+// @Router		/records [post]
 func post(ctx *gin.Context) {
 	// 参数
 	var req postReq

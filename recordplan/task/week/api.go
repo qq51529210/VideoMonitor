@@ -1,6 +1,6 @@
 package week
 
-import "recordplan/db"
+import "github.com/qq51529210/video-monitor/recordplan/db"
 
 // Run 启动后台检查
 func Run(checkInterval, concurrency, apiTimeout int) error {

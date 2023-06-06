@@ -9,8 +9,8 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	"cloudrecord/api/internal/docs"
-	"cloudrecord/api/records"
+	"github.com/qq51529210/video-monitor/cloudrecord/api/internal/docs"
+	"github.com/qq51529210/video-monitor/cloudrecord/api/records"
 
 	"github.com/gin-gonic/gin"
 )

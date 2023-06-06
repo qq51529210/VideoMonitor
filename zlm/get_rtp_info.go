@@ -1,19 +1,15 @@
 package zlm
 
-import "net/url"
+import (
+	"net/http"
+
+	"github.com/qq51529210/util"
+)
 
 // GetRTPInfoReq 是 GetRTPInfo 的参数
 type GetRTPInfoReq struct {
 	// RTP的ssrc，16进制字符串或者是流的id(openRtpServer接口指定)
-	Stream string
-}
-
-func (m *GetRTPInfoReq) toQuery() url.Values {
-	q := make(url.Values)
-	if m.Stream != "" {
-		q.Set("stream_id", m.Stream)
-	}
-	return q
+	Stream string `query:"stream_id"`
 }
 
 // GetRTPInfoRes 是 GetRTPInfo 的返回值
@@ -38,18 +34,22 @@ type getRTPInfoRes struct {
 
 // GetRTPInfo 调用 /index/api/getRtpInfo
 // 获取rtp代理时的某路ssrc rtp信息
-func (s *Server) GetRTPInfo(req *GetRTPInfoReq) (*GetRTPInfoRes, error) {
-	query := make(url.Values)
-	if req != nil {
-		query = req.toQuery()
-	}
-	var res getRTPInfoRes
-	err := httpGet(s, s.url("getRtpInfo"), query, &res)
+func (s *Server) GetRTPInfo(req *GetRTPInfoReq, res *GetRTPInfoRes) error {
+	var _res getRTPInfoRes
+	err := util.HTTP[any](http.MethodGet,
+		s.url("getRtpInfo"),
+		s.query(req),
+		nil,
+		&_res,
+		http.StatusOK,
+		s.APICallTimeout)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	if res.Code != 0 {
-		return nil, CodeError(res.Code)
+	if _res.Code != 0 {
+		return CodeError(_res.Code)
 	}
-	return &res.GetRTPInfoRes, nil
+	res = &_res.GetRTPInfoRes
+	//
+	return nil
 }

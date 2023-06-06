@@ -6,24 +6,27 @@ import (
 	"strings"
 )
 
+// Header 可以用于 Envelope 的 Header 字段
 type Header[Data any] struct {
 	XMLName xml.Name `xml:"http://schemas.xmlsoap.org/soap/envelope Header"`
 	Data    Data
 }
 
+// Body 可以用于 Envelope 的 Body 字段
 type Body[Data any] struct {
 	XMLName xml.Name `xml:"http://schemas.xmlsoap.org/soap/envelope Body"`
 	Data    Data
 	Fault   *Fault `xml:",omitempty"`
 }
 
+// Envelope 表示整个 xml 消息
 type Envelope[header, body any] struct {
 	XMLName xml.Name `xml:"http://schemas.xmlsoap.org/soap/envelope Envelope"`
 	Header  header
 	Body    body
 }
 
-// Fault 表示返回的错误
+// Fault 表示 Envelope.Body 中的错误
 type Fault struct {
 	XMLName xml.Name     `xml:"http://www.w3.org/2003/05/soap-envelope Fault"`
 	Code    *FaultCode   `xml:"Code"`

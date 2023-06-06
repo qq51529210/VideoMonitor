@@ -1,34 +1,21 @@
 package zlm
 
-import "net/url"
+import (
+	"net/http"
+
+	"github.com/qq51529210/util"
+)
 
 // IsRecordingReq 是 IsRecording 的参数
 type IsRecordingReq struct {
-	// 0为hls，1为mp4
-	Type string
 	// 筛选虚拟主机
-	VHost string
+	VHost string `query:"vhost"`
 	// 筛选应用名，例如 live
-	App string
+	App string `query:"app"`
 	// 筛选流id，例如 test
-	Stream string
-}
-
-func (m *IsRecordingReq) toQuery() url.Values {
-	q := make(url.Values)
-	if m.Type != "" {
-		q.Set("type", m.Type)
-	}
-	if m.VHost != "" {
-		q.Set("vhost", m.VHost)
-	}
-	if m.App != "" {
-		q.Set("app", m.App)
-	}
-	if m.Stream != "" {
-		q.Set("stream", m.Stream)
-	}
-	return q
+	Stream string `query:"stream"`
+	// 0为hls，1为mp4
+	Type string `query:"type"`
 }
 
 // isRecordingRes 是 IsRecording 的返回值
@@ -42,17 +29,19 @@ type isRecordingRes struct {
 // 获取流录制状态
 // 返回状态
 func (s *Server) IsRecording(req *IsRecordingReq) (bool, error) {
-	query := make(url.Values)
-	if req != nil {
-		query = req.toQuery()
-	}
-	var res isRecordingRes
-	err := httpGet(s, s.url("isRecording"), query, &res)
+	var _res isRecordingRes
+	err := util.HTTP[any](http.MethodGet,
+		s.url("isRecording"),
+		s.query(req),
+		nil,
+		&_res,
+		http.StatusOK,
+		s.APICallTimeout)
 	if err != nil {
 		return false, err
 	}
-	if res.Code != 0 {
-		return false, CodeError(res.Code)
+	if _res.Code != 0 {
+		return false, CodeError(_res.Code)
 	}
-	return res.Status, nil
+	return _res.Status, nil
 }

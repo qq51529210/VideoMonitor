@@ -1,24 +1,48 @@
 package zlm
 
-import "net/url"
+import (
+	"errors"
+	"net/http"
+
+	"github.com/qq51529210/util"
+)
+
+var (
+	errServerConfigNotFound = errors.New("media server config not found")
+)
 
 // GetServerConfigRes 是 GetThreadsLoad 的返回值
-type GetServerConfigRes struct {
+type getServerConfigRes struct {
 	Code int       `json:"code"`
 	Data []*Config `json:"data"`
 }
 
 // GetServerConfig 调用 /index/api/getServerConfig
 // 获取服务器配置
-func (s *Server) GetServerConfig() ([]*Config, error) {
-	var res GetServerConfigRes
-	query := make(url.Values)
-	err := httpGet(s, s.url("getServerConfig"), query, &res)
+func (s *Server) GetServerConfig() error {
+	var _res getServerConfigRes
+	err := util.HTTP[any](http.MethodGet,
+		s.url("getServerConfig"),
+		s.query(nil),
+		nil,
+		&_res,
+		http.StatusOK,
+		s.APICallTimeout)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	if res.Code != 0 {
-		return nil, CodeError(res.Code)
+	if _res.Code != 0 {
+		return CodeError(_res.Code)
 	}
-	return res.Data, nil
+	if len(_res.Data) < 1 {
+		return errServerConfigNotFound
+	}
+	for _, cfg := range _res.Data {
+		if cfg.GeneralMediaServerID == s.ID {
+			s.cfg = cfg
+			break
+		}
+	}
+	//
+	return nil
 }

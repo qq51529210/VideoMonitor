@@ -1,9 +1,10 @@
 package main
 
 import (
-	"recordassist/api"
-	"recordassist/db"
-	"recordassist/zlm"
+	"github.com/qq51529210/util"
+	"github.com/qq51529210/video-monitor/recordassist/api"
+	"github.com/qq51529210/video-monitor/recordassist/db"
+	"github.com/qq51529210/video-monitor/recordassist/zlm"
 
 	"github.com/qq51529210/log"
 )
@@ -20,7 +21,7 @@ func main() {
 		panic(err)
 	}
 	// 日志
-	err = initLogger()
+	err = util.InitLog(&_cfg.Log)
 	if err != nil {
 		panic(err)
 	}

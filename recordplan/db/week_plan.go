@@ -61,11 +61,11 @@ type WeekPlan struct {
 type WeekPlanQuery struct {
 	util.GORMPage
 	// 名称，模糊匹配
-	Name string `form:"name" binding:"omitempty,max=32" gq:"like=Name"`
+	Name *string `form:"name" binding:"omitempty,max=32" gq:"like"`
 	// 是否禁用，精确匹配
-	Enable *int8 `form:"enable" binding:"omitempty,oneof=0 1" gq:"eq=Enable"`
+	Enable *int8 `form:"enable" binding:"omitempty,oneof=0 1" gq:"eq"`
 	// 保存的天数
-	SaveDay *int16 `form:"saveDay" binding:"omitempty,min=1" gq:"eq=SaveDay"`
+	SaveDay *int16 `form:"saveDay" binding:"omitempty,min=1" gq:"eq"`
 }
 
 // Init 实现 Query 接口

@@ -3,8 +3,8 @@ package weekplans
 import (
 	"net/http"
 
-	"recordplan/api/internal"
-	"recordplan/db"
+	"github.com/qq51529210/video-monitor/recordplan/api/internal"
+	"github.com/qq51529210/video-monitor/recordplan/db"
 
 	"github.com/gin-gonic/gin"
 )

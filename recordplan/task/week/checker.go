@@ -2,10 +2,11 @@ package week
 
 import (
 	"net/http"
-	"recordplan/db"
 	"runtime"
 	"sync"
 	"time"
+
+	"github.com/qq51529210/video-monitor/recordplan/db"
 
 	"github.com/qq51529210/log"
 	"github.com/qq51529210/util"

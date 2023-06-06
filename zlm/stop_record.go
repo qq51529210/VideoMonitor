@@ -1,34 +1,21 @@
 package zlm
 
-import "net/url"
+import (
+	"net/http"
+
+	"github.com/qq51529210/util"
+)
 
 // StopRecordReq 是 StopRecord 的参数
 type StopRecordReq struct {
+	// 添加的流的虚拟主机，例如 __defaultVhost__
+	VHost string `query:"vhost"`
+	// 添加的应用名，例如 live
+	App string `query:"app"`
+	// 添加的流id，例如 test
+	Stream string `query:"stream"`
 	// 0为hls，1为mp4
-	Type string
-	// 筛选虚拟主机
-	VHost string
-	// 筛选应用名，例如 live
-	App string
-	// 筛选流id，例如 test
-	Stream string
-}
-
-func (m *StopRecordReq) toQuery() url.Values {
-	q := make(url.Values)
-	if m.Type != "" {
-		q.Set("type", m.Type)
-	}
-	if m.VHost != "" {
-		q.Set("vhost", m.VHost)
-	}
-	if m.App != "" {
-		q.Set("app", m.App)
-	}
-	if m.Stream != "" {
-		q.Set("stream", m.Stream)
-	}
-	return q
+	Type string `query:"type"`
 }
 
 // stopRecordRes 是 StopRecord 的返回值
@@ -42,17 +29,19 @@ type stopRecordRes struct {
 // 停止录制流
 // 返回是否成功
 func (s *Server) StopRecord(req *StopRecordReq) (bool, error) {
-	query := make(url.Values)
-	if req != nil {
-		query = req.toQuery()
-	}
-	var res stopRecordRes
-	err := httpGet(s, s.url("stopRecord"), query, &res)
+	var _res stopRecordRes
+	err := util.HTTP[any](http.MethodGet,
+		s.url("stopRecord"),
+		s.query(req),
+		nil,
+		&_res,
+		http.StatusOK,
+		s.APICallTimeout)
 	if err != nil {
 		return false, err
 	}
-	if res.Code != 0 {
-		return false, CodeError(res.Code)
+	if _res.Code != 0 {
+		return false, CodeError(_res.Code)
 	}
-	return res.Result, nil
+	return _res.Result, nil
 }

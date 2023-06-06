@@ -1,7 +1,7 @@
 package streams
 
 import (
-	weekplans "recordplan/api/streams/week_plans"
+	weekplans "github.com/qq51529210/video-monitor/recordplan/api/streams/week_plans"
 
 	"github.com/gin-gonic/gin"
 )

@@ -3,14 +3,15 @@ package api
 import (
 	"fmt"
 	"net/http"
-	"recordassist/api/internal/docs"
 	"time"
+
+	"github.com/qq51529210/video-monitor/recordassist/api/internal/docs"
 
 	"github.com/qq51529210/log"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	"recordassist/api/zlm"
+	"github.com/qq51529210/video-monitor/recordassist/api/zlm"
 
 	"github.com/gin-gonic/gin"
 )

@@ -2,9 +2,10 @@ package weekplans
 
 import (
 	"encoding/json"
-	"recordplan/api/week_plans/streams"
-	"recordplan/db"
 	"strings"
+
+	"github.com/qq51529210/video-monitor/recordplan/api/week_plans/streams"
+	"github.com/qq51529210/video-monitor/recordplan/db"
 
 	"github.com/gin-gonic/gin"
 )

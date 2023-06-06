@@ -38,7 +38,6 @@ type PlayMediaInfoMediaInfo struct {
 type PlayMediaInfo struct {
 	RTSP *PlayMediaInfoMediaInfo `json:"rtsp"`
 	RTMP *PlayMediaInfoMediaInfo `json:"rtmp"`
-	// FLV  *PlayMediaInfoMediaInfo `json:"flv"`
 	HLS  *PlayMediaInfoMediaInfo `json:"hls"`
 	TS   *PlayMediaInfoMediaInfo `json:"ts"`
 	FMP4 *PlayMediaInfoMediaInfo `json:"fmp4"`
@@ -235,8 +234,13 @@ func (s *Server) InitPlayMediaInfo(media *MediaInfo, res *PlayMediaInfo) {
 }
 
 // GetPlayURL 返回拼接的各种协议的 URL 列表，不管服务在不在
-func (s *Server) GetPlayURL(app, stream string) []string {
-	ip := s.model.PublicIP
+func (s *Server) GetPlayURL(app, stream string, publicIP bool) []string {
+	var ip string
+	if publicIP {
+		ip = s.PublicIP
+	} else {
+		ip = s.PrivateIP
+	}
 	cfg := s.cfg
 	urls := make([]string, 0, 14)
 	if cfg.RTSPPort != "" {

@@ -1,133 +1,77 @@
 package zlm
 
-import "net/url"
+import (
+	"net/http"
+
+	"github.com/qq51529210/util"
+)
 
 // AddStreamProxyReq 是 AddStreamProxy 参数
 type AddStreamProxyReq struct {
-	// 添加的流的虚拟主机，例如 __defaultVhost__
-	VHost string
-	// 添加的应用名，例如 live
-	App string
-	// 添加的流id，例如 test
-	Stream string
+	// 流虚拟主机
+	VHost string `query:"vhost"`
+	// 流应用名
+	App string `query:"app"`
+	// 流ID
+	Stream string `query:"stream"`
 	// 拉流地址，例如rtmp://live.hkstv.hk.lxdns.com/live/hks2
-	URL string
+	URL string `query:"url"`
 	// rtsp拉流时，拉流方式，0：tcp，1：udp，2：组播
-	RTPType string
+	RTPType string `query:"rtp_type"`
 	// 拉流超时时间，单位秒，float类型
-	TimeoutSec string
+	TimeoutSec string `query:"timeout_sec"`
 	// 拉流重试次数,不传此参数或传值<=0时，则无限重试
-	RetryCount string
+	RetryCount string `query:"retry_count"`
 	// 是否转换成hls协议，0/1
-	EnableHLS string
+	EnableHLS string `query:"enable_hls"`
 	// 是否转换成mp4协议，0/1
-	EnableMP4 string
+	EnableMP4 string `query:"enable_mp4"`
 	// 是否转换成rtsp协议，0/1
-	EnableRTSP string
+	EnableRTSP string `query:"enable_rtsp"`
 	// 是否转换成rtmp/flv协议，0/1
-	EnableRTMP string
+	EnableRTMP string `query:"enable_rtmp"`
 	// 是否转换成http-ts/ws-ts协议，0/1
-	EnableTS string
+	EnableTS string `query:"enable_ts"`
 	// 是否转换成http-fmp4/ws-fmp4协议，0/1
-	EnableFMP4 string
+	EnableFMP4 string `query:"enable_fmp4"`
 	// 转协议时是否开启音频
-	EnableAudio string
+	EnableAudio string `query:"enable_audio"`
 	// 转协议时，无音频是否添加静音aac音频
-	AddMuteAudio string
+	AddMuteAudio string `query:"add_mute_audio"`
 	// mp4录制文件保存根目录，置空使用默认
-	MP4SavePath string
+	MP4SavePath string `query:"mp4_save_path"`
 	// mp4录制切片大小，单位秒
-	MP4MaxSecond string
+	MP4MaxSecond string `query:"mp4_max_second"`
 	// hls文件保存保存根目录，置空使用默认
-	HLSSavePath string
+	HLSSavePath string `query:"hls_save_path"`
 }
 
-func (m *AddStreamProxyReq) toQuery() url.Values {
-	q := make(url.Values)
-	if m.VHost != "" {
-		q.Set("vhost", m.VHost)
-	}
-	if m.App != "" {
-		q.Set("app", m.App)
-	}
-	if m.Stream != "" {
-		q.Set("stream", m.Stream)
-	}
-	if m.URL != "" {
-		q.Set("url", m.URL)
-	}
-	if m.RetryCount != "" {
-		q.Set("retry_count", m.RetryCount)
-	}
-	if m.RTPType != "" {
-		q.Set("rtp_type", m.RTPType)
-	}
-	if m.TimeoutSec != "" {
-		q.Set("timeout_sec	", m.TimeoutSec)
-	}
-	if m.EnableHLS != "" {
-		q.Set("enable_hls", m.EnableHLS)
-	}
-	if m.EnableMP4 != "" {
-		q.Set("enable_mp4", m.EnableMP4)
-	}
-	if m.EnableRTSP != "" {
-		q.Set("enable_rtsp", m.EnableRTSP)
-	}
-	if m.EnableRTMP != "" {
-		q.Set("enable_rtmp", m.EnableRTMP)
-	}
-	if m.EnableTS != "" {
-		q.Set("enable_ts", m.EnableTS)
-	}
-	if m.EnableFMP4 != "" {
-		q.Set("enable_fmp4", m.EnableFMP4)
-	}
-	if m.EnableAudio != "" {
-		q.Set("enable_audio", m.EnableAudio)
-	}
-	if m.AddMuteAudio != "" {
-		q.Set("add_mute_audio", m.AddMuteAudio)
-	}
-	if m.MP4SavePath != "" {
-		q.Set("mp4_save_path", m.MP4SavePath)
-	}
-	if m.MP4MaxSecond != "" {
-		q.Set("mp4_max_second", m.MP4MaxSecond)
-	}
-	if m.HLSSavePath != "" {
-		q.Set("hls_save_path", m.HLSSavePath)
-	}
-	return q
-}
-
-// addStreamProxyRes 是 AddStreamProxy 返回值
+// addStreamProxyRes 用于解析 addStreamProxy 的返回值
 type addStreamProxyRes struct {
-	Code int                   `json:"code"`
-	Data AddStreamProxyResData `json:"data"`
-}
-
-// AddStreamProxyResData 是 addStreamProxyRes 的 Data 字段
-type AddStreamProxyResData struct {
-	// 流的唯一标识
-	Key string
+	Code int `json:"code"`
+	Data struct {
+		// 流的唯一标识
+		Key string `json:"key"`
+	} `json:"data"`
 }
 
 // AddStreamProxy 调用 /index/api/addStreamProxy
 // 动态添加rtsp/rtmp/hls拉流代理(只支持H264/H265/aac/G711负载)
 // 返回 key
 func (s *Server) AddStreamProxy(req *AddStreamProxyReq) (string, error) {
-	query := make(url.Values)
-	if req != nil {
-		query = req.toQuery()
-	}
-	var res addStreamProxyRes
-	err := httpGet(s, s.url("addStreamProxy"), query, &res)
+	var _res addStreamProxyRes
+	err := util.HTTP[any](http.MethodGet,
+		s.url("addStreamProxy"),
+		s.query(req),
+		nil,
+		&_res,
+		http.StatusOK,
+		s.APICallTimeout)
 	if err != nil {
 		return "", err
 	}
-	if res.Code != 0 {
-		return "", CodeError(res.Code)
+	if _res.Code != 0 {
+		return "", CodeError(_res.Code)
 	}
-	return res.Data.Key, nil
+	return _res.Data.Key, nil
 }

@@ -9,8 +9,8 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	"recordplan/api/internal/docs"
-	weekplans "recordplan/api/week_plans"
+	"github.com/qq51529210/video-monitor/recordplan/api/internal/docs"
+	weekplans "github.com/qq51529210/video-monitor/recordplan/api/week_plans"
 
 	"github.com/gin-gonic/gin"
 )

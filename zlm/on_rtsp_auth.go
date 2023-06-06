@@ -2,18 +2,18 @@ package zlm
 
 // OnRTSPAuthReq 表示 on_rtsp_auth 提交的数据
 type OnRTSPAuthReq struct {
-	// 服务器id,通过配置文件设置
+	// 服务器id，通过配置文件设置
 	MediaServerID string `json:"mediaServerId"`
-	// TCP链接唯一ID
-	ID string `json:"id"`
-	// 流应用名
-	App string `json:"app"`
-	// rtsp或rtsps
-	Schema string `json:"schema"`
-	// 流ID
-	Stream string `json:"stream"`
 	// 流虚拟主机
 	VHost string `json:"vhost"`
+	// rtsp或rtsps
+	Schema string `json:"schema"`
+	// 流应用名
+	App string `json:"app"`
+	// 流ID
+	Stream string `json:"stream"`
+	// TCP链接唯一ID
+	ID string `json:"id"`
 	// rtsp播放器ip
 	IP string `json:"ip"`
 	// rtsp播放器端口号
@@ -28,7 +28,7 @@ type OnRTSPAuthReq struct {
 	MustNoEncrypt bool `json:"must_no_encrypt"`
 }
 
-// OnRTSPAuth 处理 zlm 的 on_rtsp_auth 回调
-func OnRTSPAuth(data *OnRTSPAuthReq) (encrypted bool, passwd string, err error) {
-	return false, "", nil
-}
+// // OnRTSPAuth 处理 zlm 的 on_rtsp_auth 回调
+// func OnRTSPAuth(data *OnRTSPAuthReq) (encrypted bool, passwd string, err error) {
+// 	return false, "", nil
+// }

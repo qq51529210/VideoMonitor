@@ -13,11 +13,13 @@ var (
 	_rand = rand.New(rand.NewSource(time.Now().UnixMilli()))
 )
 
+// Security 表示
 type Security struct {
 	XMLName       xml.Name `xml:"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd Security"`
 	UsernameToken UsernameToken
 }
 
+// Init 初始化 s
 func (s *Security) Init(username, password string) {
 	//
 	s.UsernameToken.Username = username
@@ -40,6 +42,7 @@ func (s *Security) Init(username, password string) {
 	s.UsernameToken.Nonce.Nonce = base64.StdEncoding.EncodeToString(nonce)
 }
 
+// UsernameToken 表示 Security 的 UsernameToken 字段
 type UsernameToken struct {
 	XMLName  xml.Name `xml:"UsernameToken"`
 	Username string   `xml:"Username"`
@@ -48,11 +51,13 @@ type UsernameToken struct {
 	Created  string   `xml:"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd Created"`
 }
 
+// Password 表示 UsernameToken 的 Password 字段
 type Password struct {
 	Type     string `xml:"Type,attr"`
 	Password string `xml:",chardata"`
 }
 
+// Nonce 表示 UsernameToken 的 Nonce 字段
 type Nonce struct {
 	Type  string `xml:"EncodingType,attr"`
 	Nonce string `xml:",chardata"`

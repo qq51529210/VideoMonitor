@@ -1,7 +1,7 @@
 package internal
 
 // import (
-// 	"cloudrecord/db"
+// 	"github.com/qq51529210/video-monitor/cloudrecord/db"
 // 	"fmt"
 // 	"time"
 

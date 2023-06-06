@@ -1,9 +1,9 @@
 package main
 
 import (
-	"recordplan/api"
-	"recordplan/db"
-	"recordplan/task/week"
+	"github.com/qq51529210/video-monitor/recordplan/api"
+	"github.com/qq51529210/video-monitor/recordplan/db"
+	"github.com/qq51529210/video-monitor/recordplan/task/week"
 
 	"github.com/qq51529210/log"
 	"github.com/qq51529210/util"

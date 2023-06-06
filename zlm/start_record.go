@@ -1,44 +1,25 @@
 package zlm
 
-import "net/url"
+import (
+	"net/http"
+
+	"github.com/qq51529210/util"
+)
 
 // StartRecordReq 是 StartRecord 的参数
 type StartRecordReq struct {
+	// 添加的流的虚拟主机，例如 __defaultVhost__
+	VHost string `query:"vhost"`
+	// 添加的应用名，例如 live
+	App string `query:"app"`
+	// 添加的流id，例如 test
+	Stream string `query:"stream"`
 	// 0为hls，1为mp4
-	Type string
-	// 筛选虚拟主机
-	VHost string
-	// 筛选应用名，例如 live
-	App string
-	// 筛选流id，例如 test
-	Stream string
+	Type string `query:"type"`
 	// 录像保存目录
-	CustomizedPath string
+	CustomizedPath string `query:"customized_path"`
 	// mp4录像切片时间大小,单位秒，置0则采用配置项
-	MaxSecond string
-}
-
-func (m *StartRecordReq) toQuery() url.Values {
-	q := make(url.Values)
-	if m.Type != "" {
-		q.Set("type", m.Type)
-	}
-	if m.VHost != "" {
-		q.Set("vhost", m.VHost)
-	}
-	if m.App != "" {
-		q.Set("app", m.App)
-	}
-	if m.Stream != "" {
-		q.Set("stream", m.Stream)
-	}
-	if m.CustomizedPath != "" {
-		q.Set("customized_path", m.CustomizedPath)
-	}
-	if m.MaxSecond != "" {
-		q.Set("max_second", m.MaxSecond)
-	}
-	return q
+	MaxSecond string `query:"max_second"`
 }
 
 // startRecordRes 是 StartRecord 的返回值
@@ -52,17 +33,19 @@ type startRecordRes struct {
 // 开始录制hls或MP4
 // 返回是否成功
 func (s *Server) StartRecord(req *StartRecordReq) (bool, error) {
-	query := make(url.Values)
-	if req != nil {
-		query = req.toQuery()
-	}
-	var res startRecordRes
-	err := httpGet(s, s.url("startRecord"), query, &res)
+	var _res startRecordRes
+	err := util.HTTP[any](http.MethodGet,
+		s.url("startRecord"),
+		s.query(req),
+		nil,
+		&_res,
+		http.StatusOK,
+		s.APICallTimeout)
 	if err != nil {
 		return false, err
 	}
-	if res.Code != 0 {
-		return false, CodeError(res.Code)
+	if _res.Code != 0 {
+		return false, CodeError(_res.Code)
 	}
-	return res.Result, nil
+	return _res.Result, nil
 }

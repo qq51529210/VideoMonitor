@@ -2,8 +2,9 @@ package internal
 
 import (
 	"fmt"
-	"recordplan/db"
 	"time"
+
+	"github.com/qq51529210/video-monitor/recordplan/db"
 
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"

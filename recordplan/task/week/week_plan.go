@@ -3,8 +3,9 @@ package week
 import (
 	"bytes"
 	"encoding/json"
-	"recordplan/db"
 	"time"
+
+	"github.com/qq51529210/video-monitor/recordplan/db"
 
 	"github.com/qq51529210/log"
 )

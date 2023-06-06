@@ -2,8 +2,9 @@ package zlm
 
 import (
 	"net/http"
-	"recordassist/api/internal"
-	"recordassist/db"
+
+	"github.com/qq51529210/video-monitor/recordassist/api/internal"
+	"github.com/qq51529210/video-monitor/recordassist/db"
 
 	"github.com/gin-gonic/gin"
 	"github.com/qq51529210/log"
