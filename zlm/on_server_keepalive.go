@@ -1,5 +1,9 @@
 package zlm
 
+import (
+	"time"
+)
+
 // OnServerKeepaliveReq 表示 on_server_keepalive 提交的数据
 type OnServerKeepaliveReq struct {
 	Data          *OnServerKeepaliveDataModel `json:"data"`
@@ -26,25 +30,14 @@ type OnServerKeepaliveDataModel struct {
 	UDPSession            int `json:"UdpSession"`
 }
 
-// // OnServerKeepalive 处理 zlm 的 on_server_keepalive 回调
-// func OnServerKeepalive(ip string, data *OnServerKeepaliveReq) {
-// 	// 获取实例
-// 	lock.RLock()
-// 	defer lock.RUnlock()
-// 	ser := servers[data.MediaServerID]
-// 	if ser == nil {
-// 		return
-// 	}
-// 	now := time.Now()
-// 	// 如果是超时的，那么重新加载一下数据
-// 	if atomic.LoadInt32(&ser.ok) == 0 && now.Sub(*ser.keepaliveTime) > ser.keepaliveTimeout {
-// 		wg.Add(1)
-// 		go ser.loadDataRoutine()
-// 		return
-// 	}
-// 	ser.keepaliveTime = &now
-// 	if data.Data != nil {
-// 		atomic.StoreInt32(&ser.load, int32(data.Data.TCPSession))
-// 	}
-// 	atomic.StoreInt32(&ser.offline, 0)
-// }
+// OnServerKeepalive 处理 zlm 的 on_server_keepalive 回调
+func (g *Group) OnServerKeepalive(req *OnServerKeepaliveReq) {
+	// 服务
+	ser := g.Get(req.MediaServerID)
+	if !ser.IsOK() {
+		return
+	}
+	now := time.Now()
+	ser.keepalive = &now
+	ser.Online = true
+}

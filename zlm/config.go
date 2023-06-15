@@ -265,7 +265,7 @@ type Config struct {
 	HTTPSendBufSize string `json:"http.sendBufSize"`
 	// https服务器监听端口
 	// sslport=443
-	HTTPSSLport string `json:"http.sslport"`
+	HTTPSSLPort string `json:"http.sslport"`
 	// 是否显示文件夹菜单，开启后可以浏览文件夹
 	// dirMenu=1
 	HTTPDirMenu string `json:"http.dirMenu"`
@@ -693,8 +693,8 @@ func (c *Config) toQuery() url.Values {
 	if c.HTTPSendBufSize != "" {
 		m.Set("http.sendBufSize", c.HTTPSendBufSize)
 	}
-	if c.HTTPSSLport != "" {
-		m.Set("http.sslport", c.HTTPSSLport)
+	if c.HTTPSSLPort != "" {
+		m.Set("http.sslport", c.HTTPSSLPort)
 	}
 	if c.HTTPDirMenu != "" {
 		m.Set("http.dirMenu", c.HTTPDirMenu)

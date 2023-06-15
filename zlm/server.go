@@ -4,32 +4,25 @@ import (
 	"fmt"
 	"net/url"
 	"reflect"
+	"strconv"
 	"sync"
-	"sync/atomic"
 	"time"
-)
 
-var (
-	_servers servers
+	"github.com/qq51529210/log"
+	"github.com/qq51529210/util"
 )
-
-func init() {
-	_servers.ser = make(map[string]*Server)
-}
 
 // Server 表示一个流媒体服务
 type Server struct {
-	lock   sync.Mutex
-	stream map[string]*MediaInfo
 	// 配置
-	cfg *Config
+	Cfg *Config
 	// 流媒体夫 ID
 	ID string
 	// 调用的密钥
 	Secret string
-	// api 调用超时
+	// api 调用超时，单位秒
 	APICallTimeout time.Duration
-	// 同步媒体流的间隔
+	// 同步媒体流的间隔，单位秒
 	SyncInterval time.Duration
 	// API 地址 (http|https)://ip:port
 	APIBaseURL string
@@ -37,17 +30,31 @@ type Server struct {
 	PublicIP string
 	// 内网访问的 ip ，生成播放地址时使用
 	PrivateIP string
+	// 截图目录，不为空在更新媒体流列表时会自动截图并保存
+	SnapDir string
+	// 负载
+	Load int32
 	// 心跳时间，后台更新
 	keepalive *time.Time
+	// 心跳超时时间，从流媒体服务配置中得到
+	keepaliveTimeout time.Duration
 	// 是否在线，后台更新
-	online bool
+	Online bool
+	// 数据版本，用于移除列表的时候判断
+	version int64
 	// 是否可用
-	ok int32
+	ok bool
+	// 退出信号
+	quit *util.Signal
+	// 同步锁
+	lock sync.RWMutex
+	// 媒体流列表，app:stream:
+	media map[string]map[string]*mediaInfo
 }
 
 // IsOK 返回服务是否可用
 func (s *Server) IsOK() bool {
-	return s != nil && atomic.LoadInt32(&s.ok) == 1
+	return s != nil && s.Online && s.ok
 }
 
 func (s *Server) url(path string) string {
@@ -88,43 +95,116 @@ func (s *Server) query(v any) url.Values {
 	return q
 }
 
-// servers 用于管理所有的流媒体服务
-type servers struct {
-	sync.RWMutex
-	// 列表
-	ser map[string]*Server
-}
-
-// Add 添加一个 ser 到管理
-func Add(ser *Server) {
-	ser.stream = make(map[string]*MediaInfo)
-	_servers.Lock()
-	_servers.ser[ser.ID] = ser
-	_servers.Unlock()
-}
-
-// Get 返回指定 id 的 Server
-func Get(id string) *Server {
-	// 查找
-	_servers.RLock()
-	s := _servers.ser[id]
-	_servers.RUnlock()
-	//
-	return s
-}
-
-// Remove 移除指定 id 的 Server
-func Remove(id string) {
-	_servers.Lock()
-	delete(_servers.ser, id)
-	_servers.Unlock()
-}
-
-// BatchRemove 批量移除指定 id 的 Server
-func BatchRemove(ids []string) {
-	_servers.Lock()
-	for _, id := range ids {
-		delete(_servers.ser, id)
+// mustLoadMediaList 从 zlm 读取配置，循环读取直到成功
+func (s *Server) mustLoadMediaList(timer *time.Timer) bool {
+	timer.Reset(0)
+	for {
+		select {
+		case <-s.quit.C:
+			// 服务退出
+			return false
+		case <-timer.C:
+			// 加载
+			err := s.loadMediaList()
+			if err != nil {
+				log.ErrorTrace(s.ID, err)
+				break
+			}
+			// 成功返回
+			return true
+		}
+		// 请求失败，一会儿重试
+		timer.Reset(time.Second)
 	}
-	_servers.Unlock()
+}
+
+// loadConfig 读取配置
+func (s *Server) loadConfig() error {
+	// 请求
+	err := s.GetServerConfig()
+	if err != nil {
+		return err
+	}
+	// 心跳间隔
+	n, err := strconv.ParseFloat(s.Cfg.HookAliveInterval, 64)
+	if err != nil {
+		return err
+	}
+	// 加 3 秒作为网络缓冲
+	s.keepaliveTimeout = time.Duration(n+3) * time.Second
+	// 返回
+	return nil
+}
+
+// mustLoadConfig 读取配置直到成功
+func (s *Server) mustLoadConfig(timer *time.Timer) bool {
+	timer.Reset(0)
+	for {
+		select {
+		case <-s.quit.C:
+			// 服务退出
+			return false
+		case <-timer.C:
+			// 加载
+			err := s.loadConfig()
+			if err != nil {
+				log.ErrorTrace(s.ID, err)
+				break
+			}
+			// 成功返回
+			return true
+		}
+		// 请求失败，一会儿重试
+		timer.Reset(time.Second)
+	}
+}
+
+// loadConfig 从 zlm 读取流媒体列表，然后检查推流和拉流
+func (s *Server) loadMediaList() error {
+	// 请求
+	data, err := s.GetMediaList(&GetMediaListReq{Schema: RTMP})
+	if err != nil {
+		return err
+	}
+	s.UpdateMediaList(data)
+	// 返回
+	return nil
+}
+
+// getAllMedia 返回所有的媒体流
+func (s *Server) getAllMedia() []*mediaInfo {
+	var ms []*mediaInfo
+	s.lock.RLock()
+	for _, app := range s.media {
+		for _, stream := range app {
+			ms = append(ms, stream)
+		}
+	}
+	s.lock.RUnlock()
+	//
+	return ms
+}
+
+// UpdateMediaList 更新保存的媒体流列表
+func (s *Server) UpdateMediaList(m []*MediaList) {
+	// 解析
+	medias := make(map[string]map[string]*mediaInfo)
+	for _, d := range m {
+		// 轨道
+		info := new(mediaInfo)
+		info.Video, info.Audio = parseTracks(d.Tracks)
+		info.App, info.Stream = d.App, d.Stream
+		info.IsRecordingMP4, info.IsRecordingHLS = d.IsRecordingMP4, d.IsRecordingHLS
+		// 列表
+		app := medias[d.App]
+		if app == nil {
+			app = make(map[string]*mediaInfo)
+			medias[d.App] = app
+		}
+		app[d.Schema] = info
+	}
+	// 替换
+	s.lock.Lock()
+	s.media = medias
+	s.lock.Unlock()
 }

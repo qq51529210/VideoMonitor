@@ -39,7 +39,7 @@ func (s *Server) GetServerConfig() error {
 	}
 	for _, cfg := range _res.Data {
 		if cfg.GeneralMediaServerID == s.ID {
-			s.cfg = cfg
+			s.Cfg = cfg
 			break
 		}
 	}

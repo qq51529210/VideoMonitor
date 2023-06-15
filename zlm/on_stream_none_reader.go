@@ -14,8 +14,8 @@ type OnStreamNoneReaderReq struct {
 	Stream string `json:"stream"`
 }
 
-// OnStreamNoneReader 处理 zlm 的 on_stream_none_reader 回调
-func OnStreamNoneReader(data *OnStreamNoneReaderReq) bool {
-	// 断流
-	return true
-}
+// // OnStreamNoneReader 处理 zlm 的 on_stream_none_reader 回调
+// func OnStreamNoneReader(data *OnStreamNoneReaderReq) bool {
+// 	// 断流
+// 	return true
+// }
