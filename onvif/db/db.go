@@ -29,6 +29,11 @@ func Init(uri string, cache bool) error {
 	if err != nil {
 		return err
 	}
+	// 数据
+	err = initData()
+	if err != nil {
+		return err
+	}
 	// 数据访问
 	initDA(db, cache)
 	//
@@ -45,6 +50,8 @@ func initDB(uri string) (*gorm.DB, error) {
 // initTable 创建表
 func initTable(db *gorm.DB) error {
 	return db.AutoMigrate(
+		&MediaServerGroup{},
+		&MediaServer{},
 		&Discovery{},
 		// &WeekPlanStream{},
 	)
@@ -52,7 +59,19 @@ func initTable(db *gorm.DB) error {
 
 // initDA 创建各个数据访问
 func initDA(db *gorm.DB, cache bool) {
+	initMediaServerGroupDA(db, false)
+	initMediaServerDA(db, false)
 	initDiscoveryDA(db, false)
 	initDeviceDA(db, cache)
 	initChannelDA(db, cache)
+}
+
+// initData 初始化默认数据
+func initData() error {
+	err := initDefaultMediaServerGroup()
+	if err != nil {
+		return err
+	}
+	//
+	return nil
 }

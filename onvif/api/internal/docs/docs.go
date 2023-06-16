@@ -16,143 +16,13 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/streams": {
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "媒体流"
-                ],
-                "summary": "批量删除",
-                "parameters": [
-                    {
-                        "description": "Stream 数组",
-                        "name": "stream",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/internal.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/internal.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/streams/{stream}": {
-            "delete": {
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "媒体流"
-                ],
-                "summary": "删除",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Stream",
-                        "name": "stream",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/internal.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/internal.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/streams/{stream}/week_plans": {
+        "/media_server_groups": {
             "get": {
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "媒体流"
-                ],
-                "summary": "获取周计划",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Stream",
-                        "name": "stream",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/weekplans.weekplan"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/internal.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/internal.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/week_plans": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "周计划"
+                    "流媒体服务分组"
                 ],
                 "summary": "列表",
                 "parameters": [
@@ -164,19 +34,16 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
-                        "enum": [
-                            0,
-                            1
-                        ],
-                        "type": "integer",
-                        "description": "是否禁用，精确匹配",
-                        "name": "enable",
+                        "maxLength": 128,
+                        "type": "string",
+                        "description": "描述，模糊",
+                        "name": "describe",
                         "in": "query"
                     },
                     {
                         "maxLength": 32,
                         "type": "string",
-                        "description": "名称，模糊匹配",
+                        "description": "名称，模糊",
                         "name": "name",
                         "in": "query"
                     },
@@ -192,20 +59,13 @@ const docTemplate = `{
                         "description": "排序，\"column [desc]\"",
                         "name": "order",
                         "in": "query"
-                    },
-                    {
-                        "minimum": 1,
-                        "type": "integer",
-                        "description": "保存的天数",
-                        "name": "saveDay",
-                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/util.GORMList-db_WeekPlan"
+                            "$ref": "#/definitions/util.GORMList-db_MediaServerGroup"
                         }
                     },
                     "400": {
@@ -230,7 +90,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "周计划"
+                    "流媒体服务分组"
                 ],
                 "summary": "添加",
                 "parameters": [
@@ -240,7 +100,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/weekplans.postReq"
+                            "$ref": "#/definitions/mediaservergroups.postReq"
                         }
                     }
                 ],
@@ -266,32 +126,21 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "consumes": [
                     "application/json"
                 ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
-                    "周计划"
+                    "流媒体服务分组"
                 ],
                 "summary": "批量删除",
                 "parameters": [
                     {
-                        "description": "条件",
+                        "description": "id 数组",
                         "name": "data",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/internal.BatchDelete-int64"
                         }
                     }
                 ],
@@ -314,19 +163,19 @@ const docTemplate = `{
                 }
             }
         },
-        "/week_plans/{id}": {
+        "/media_server_groups/{id}": {
             "get": {
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "周计划"
+                    "流媒体服务分组"
                 ],
                 "summary": "详情",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "WeekPlan.ID",
+                        "type": "integer",
+                        "description": "id",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -336,7 +185,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/db.WeekPlan"
+                            "$ref": "#/definitions/db.MediaServerGroup"
                         }
                     },
                     "404": {
@@ -354,17 +203,14 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "consumes": [
-                    "application/json"
-                ],
                 "tags": [
-                    "周计划"
+                    "流媒体服务分组"
                 ],
                 "summary": "删除",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "WeekPlan.ID",
+                        "type": "integer",
+                        "description": "id",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -396,13 +242,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "周计划"
+                    "流媒体服务分组"
                 ],
                 "summary": "修改",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "WeekPlan.ID",
+                        "type": "integer",
+                        "description": "id",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -413,7 +259,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/weekplans.patchReq"
+                            "$ref": "#/definitions/mediaservergroups.patchReq"
                         }
                     }
                 ],
@@ -439,8 +285,107 @@ const docTemplate = `{
                 }
             }
         },
-        "/week_plans/{id}/streams": {
-            "put": {
+        "/media_servers": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "流媒体服务"
+                ],
+                "summary": "列表",
+                "parameters": [
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "条数，小于 1 不匹配",
+                        "name": "count",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            0,
+                            1
+                        ],
+                        "type": "integer",
+                        "description": "是否在线，精确",
+                        "name": "describe",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            0,
+                            1
+                        ],
+                        "type": "integer",
+                        "description": "是否禁用，精确",
+                        "name": "enable",
+                        "in": "query"
+                    },
+                    {
+                        "maxLength": 32,
+                        "type": "string",
+                        "description": "id，模糊",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "所属的分组，精确",
+                        "name": "mediaServerGroupID",
+                        "in": "query"
+                    },
+                    {
+                        "maxLength": 32,
+                        "type": "string",
+                        "description": "名称，模糊",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 0,
+                        "type": "integer",
+                        "description": "偏移，小于 0 不匹配",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序，\"column [desc]\"",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "maxLength": 64,
+                        "type": "string",
+                        "description": "访问密钥，模糊",
+                        "name": "secret",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/util.GORMList-db_MediaServer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/internal.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal.Error"
+                        }
+                    }
+                }
+            },
+            "post": {
                 "consumes": [
                     "application/json"
                 ],
@@ -448,27 +393,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "周计划"
+                    "流媒体服务"
                 ],
-                "summary": "绑定媒体流",
+                "summary": "添加",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "WeekPlan.ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "媒体流数组",
+                        "description": "数据",
                         "name": "data",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/streams.stream"
-                            }
+                            "$ref": "#/definitions/mediaservers.postReq"
                         }
                     }
                 ],
@@ -498,27 +433,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "周计划"
+                    "流媒体服务"
                 ],
-                "summary": "解绑媒体流",
+                "summary": "批量删除",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "WeekPlan.ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "自定义的媒体流 ID 数组",
+                        "description": "id 数组",
                         "name": "data",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/internal.BatchDelete-string"
                         }
                     }
                 ],
@@ -540,43 +465,223 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/media_servers/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "流媒体服务"
+                ],
+                "summary": "详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.MediaServer"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/internal.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal.Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "流媒体服务"
+                ],
+                "summary": "删除",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/internal.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal.Error"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "流媒体服务"
+                ],
+                "summary": "修改",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "数据",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/mediaservers.patchReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/internal.RowResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/internal.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal.Error"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
-        "db.TimePeroid": {
+        "db.MediaServer": {
             "type": "object",
             "properties": {
-                "end": {
-                    "description": "结束时间戳",
+                "apiBaseURL": {
+                    "description": "API 地址 (http|https)://ip:port",
                     "type": "string"
                 },
-                "start": {
-                    "description": "开始时间戳",
+                "apiCallTimeout": {
+                    "description": "请求服务接口超时时间，单位，毫秒，默认 5000",
+                    "type": "integer"
+                },
+                "enable": {
+                    "description": "是否禁用，0/1",
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "id",
+                    "type": "string"
+                },
+                "keepaliveTime": {
+                    "description": "心跳时间戳",
+                    "type": "integer"
+                },
+                "mediaServerGroupID": {
+                    "description": "所属的分组",
+                    "type": "integer"
+                },
+                "name": {
+                    "description": "名称，方便记忆",
+                    "type": "string"
+                },
+                "online": {
+                    "description": "是否在线，0/1",
+                    "type": "integer"
+                },
+                "privateIP": {
+                    "description": "内网访问的 ip ，生成播放地址时使用",
+                    "type": "string"
+                },
+                "publicIP": {
+                    "description": "外网访问的 ip ，生成播放地址时使用",
+                    "type": "string"
+                },
+                "secret": {
+                    "description": "访问密钥",
                     "type": "string"
                 }
             }
         },
-        "db.WeekPlan": {
+        "db.MediaServerGroup": {
             "type": "object",
             "properties": {
-                "enable": {
-                    "description": "是否禁用\n0: 禁用\n1: 启用",
-                    "type": "integer"
+                "describe": {
+                    "description": "描述",
+                    "type": "string"
                 },
                 "id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "name": {
                     "description": "名称",
                     "type": "string"
-                },
-                "peroids": {
-                    "description": "是一个 RecordTime 的 JSON 数组",
-                    "type": "string"
-                },
-                "saveDay": {
-                    "description": "保存的天数",
-                    "type": "integer"
+                }
+            }
+        },
+        "internal.BatchDelete-int64": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "description": "数据库 ID 数组",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "internal.BatchDelete-string": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "description": "数据库 ID 数组",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },
@@ -584,7 +689,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "detail": {
-                    "description": "详细信息"
+                    "description": "详细信息",
+                    "type": "string"
                 },
                 "phrase": {
                     "description": "简短信息",
@@ -610,39 +716,158 @@ const docTemplate = `{
                 }
             }
         },
-        "streams.stream": {
+        "mediaservergroups.patchReq": {
+            "type": "object",
+            "properties": {
+                "describe": {
+                    "description": "描述",
+                    "type": "string",
+                    "maxLength": 128
+                },
+                "name": {
+                    "description": "名称",
+                    "type": "string",
+                    "maxLength": 32
+                }
+            }
+        },
+        "mediaservergroups.postReq": {
             "type": "object",
             "required": [
-                "startCallback",
-                "stopCallback",
-                "stream"
+                "name"
             ],
             "properties": {
-                "startCallback": {
-                    "description": "开始录像回调",
+                "describe": {
+                    "description": "描述",
                     "type": "string",
-                    "maxLength": 255
+                    "maxLength": 128
                 },
-                "stopCallback": {
-                    "description": "停止录像回调",
+                "name": {
+                    "description": "名称",
                     "type": "string",
-                    "maxLength": 255
+                    "maxLength": 32
+                }
+            }
+        },
+        "mediaservers.patchReq": {
+            "type": "object",
+            "properties": {
+                "apiBaseURL": {
+                    "description": "API 地址 (http|https)://ip:port",
+                    "type": "string"
                 },
-                "stream": {
-                    "description": "流的唯一标识",
+                "apiCallTimeout": {
+                    "description": "请求服务接口超时时间，单位，毫秒，默认 5000",
+                    "type": "integer",
+                    "minimum": 1000
+                },
+                "describe": {
+                    "description": "描述",
+                    "type": "string",
+                    "maxLength": 128
+                },
+                "enable": {
+                    "description": "是否禁用，0/1 ，默认 1",
+                    "type": "integer",
+                    "enum": [
+                        0,
+                        1
+                    ]
+                },
+                "mediaServerGroupID": {
+                    "description": "所属的分组 ，默认 1",
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "name": {
+                    "description": "名称",
+                    "type": "string",
+                    "maxLength": 32
+                },
+                "privateIP": {
+                    "description": "内网访问的 ip ，生成播放地址时使用，默认使用 apiBaseURL 中的 host",
+                    "type": "string"
+                },
+                "publicIP": {
+                    "description": "外网访问的 ip ，生成播放地址时使用，默认使用 apiBaseURL 中的 host",
+                    "type": "string"
+                },
+                "secret": {
+                    "description": "访问密钥",
                     "type": "string",
                     "maxLength": 64
                 }
             }
         },
-        "util.GORMList-db_WeekPlan": {
+        "mediaservers.postReq": {
+            "type": "object",
+            "required": [
+                "apiBaseURL",
+                "id",
+                "name",
+                "secret"
+            ],
+            "properties": {
+                "apiBaseURL": {
+                    "description": "API 地址 (http|https)://ip:port",
+                    "type": "string"
+                },
+                "apiCallTimeout": {
+                    "description": "请求服务接口超时时间，单位，毫秒，默认 5000",
+                    "type": "integer",
+                    "minimum": 1000
+                },
+                "describe": {
+                    "description": "描述",
+                    "type": "string",
+                    "maxLength": 128
+                },
+                "enable": {
+                    "description": "是否禁用，0/1 ，默认 1",
+                    "type": "integer",
+                    "enum": [
+                        0,
+                        1
+                    ]
+                },
+                "id": {
+                    "description": "id",
+                    "type": "string",
+                    "maxLength": 32
+                },
+                "mediaServerGroupID": {
+                    "description": "所属的分组 ，默认 1",
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "name": {
+                    "description": "名称",
+                    "type": "string",
+                    "maxLength": 32
+                },
+                "privateIP": {
+                    "description": "内网访问的 ip ，生成播放地址时使用，默认使用 apiBaseURL 中的 host",
+                    "type": "string"
+                },
+                "publicIP": {
+                    "description": "外网访问的 ip ，生成播放地址时使用，默认使用 apiBaseURL 中的 host",
+                    "type": "string"
+                },
+                "secret": {
+                    "description": "访问密钥",
+                    "type": "string",
+                    "maxLength": 64
+                }
+            }
+        },
+        "util.GORMList-db_MediaServer": {
             "type": "object",
             "properties": {
                 "data": {
                     "description": "列表",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/db.WeekPlan"
+                        "$ref": "#/definitions/db.MediaServer"
                     }
                 },
                 "total": {
@@ -651,106 +876,18 @@ const docTemplate = `{
                 }
             }
         },
-        "weekplans.patchReq": {
+        "util.GORMList-db_MediaServerGroup": {
             "type": "object",
-            "required": [
-                "peroids"
-            ],
             "properties": {
-                "enable": {
-                    "description": "是否禁用\n0: 禁用\n1: 启用",
-                    "type": "integer",
-                    "enum": [
-                        0,
-                        1
-                    ]
-                },
-                "name": {
-                    "description": "名称",
-                    "type": "string",
-                    "maxLength": 32
-                },
-                "peroids": {
-                    "description": "一周的时间数组",
+                "data": {
+                    "description": "列表",
                     "type": "array",
-                    "maxItems": 7,
-                    "minItems": 1,
                     "items": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/definitions/db.TimePeroid"
-                        }
+                        "$ref": "#/definitions/db.MediaServerGroup"
                     }
                 },
-                "saveDay": {
-                    "description": "保存的天数",
-                    "type": "integer",
-                    "minimum": 1
-                }
-            }
-        },
-        "weekplans.postReq": {
-            "type": "object",
-            "required": [
-                "name",
-                "peroids"
-            ],
-            "properties": {
-                "enable": {
-                    "description": "是否禁用，默认是 1\n0: 禁用\n1: 启用",
-                    "type": "integer",
-                    "enum": [
-                        0,
-                        1
-                    ]
-                },
-                "name": {
-                    "description": "名称",
-                    "type": "string",
-                    "maxLength": 32
-                },
-                "peroids": {
-                    "description": "一周的时间数组",
-                    "type": "array",
-                    "maxItems": 7,
-                    "minItems": 1,
-                    "items": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/definitions/db.TimePeroid"
-                        }
-                    }
-                },
-                "saveDay": {
-                    "description": "保存的天数",
-                    "type": "integer",
-                    "minimum": 1
-                }
-            }
-        },
-        "weekplans.weekplan": {
-            "type": "object",
-            "properties": {
-                "enable": {
-                    "description": "是否禁用\n0: 禁用\n1: 启用",
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "isRecording": {
-                    "type": "boolean"
-                },
-                "name": {
-                    "description": "名称",
-                    "type": "string"
-                },
-                "peroids": {
-                    "description": "是一个 RecordTime 的 JSON 数组",
-                    "type": "string"
-                },
-                "saveDay": {
-                    "description": "保存的天数",
+                "total": {
+                    "description": "总数",
                     "type": "integer"
                 }
             }

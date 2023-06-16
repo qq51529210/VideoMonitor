@@ -9,8 +9,8 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	"recordplan/api/internal/docs"
-	weekplans "recordplan/api/week_plans"
+	"github.com/qq51529210/video-monitor/onvif/api/devices"
+	"github.com/qq51529210/video-monitor/onvif/api/internal/docs"
 
 	"github.com/gin-gonic/gin"
 )
@@ -54,7 +54,7 @@ func (s *server) initRouter() {
 	// 中间件
 	s.gin.Use(global)
 	// 路由
-	weekplans.Init(s.gin)
+	devices.Init(s.gin)
 }
 
 // 全局第一个中间件

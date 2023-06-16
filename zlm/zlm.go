@@ -39,8 +39,11 @@ var (
 	ErrServerUnavailable = errors.New("media server unavailable")
 )
 
-type CodeError int
+type Error struct {
+	Code int    `json:"code"`
+	Msg  string `json:"msg"`
+}
 
-func (c CodeError) Error() string {
-	return fmt.Sprintf("error code %d", c)
+func (c *Error) Error() string {
+	return fmt.Sprintf("code: %d, msg: %s", c.Code, c.Msg)
 }

@@ -1,37 +1,76 @@
 definitions:
-  db.TimePeroid:
+  db.MediaServer:
     properties:
-      end:
-        description: 结束时间戳
+      apiBaseURL:
+        description: API 地址 (http|https)://ip:port
         type: string
-      start:
-        description: 开始时间戳
-        type: string
-    type: object
-  db.WeekPlan:
-    properties:
+      apiCallTimeout:
+        description: 请求服务接口超时时间，单位，毫秒，默认 5000
+        type: integer
       enable:
-        description: |-
-          是否禁用
-          0: 禁用
-          1: 启用
+        description: 是否禁用，0/1
         type: integer
       id:
+        description: id
         type: string
+      keepaliveTime:
+        description: 心跳时间戳
+        type: integer
+      mediaServerGroupID:
+        description: 所属的分组
+        type: integer
+      name:
+        description: 名称，方便记忆
+        type: string
+      online:
+        description: 是否在线，0/1
+        type: integer
+      privateIP:
+        description: 内网访问的 ip ，生成播放地址时使用
+        type: string
+      publicIP:
+        description: 外网访问的 ip ，生成播放地址时使用
+        type: string
+      secret:
+        description: 访问密钥
+        type: string
+    type: object
+  db.MediaServerGroup:
+    properties:
+      describe:
+        description: 描述
+        type: string
+      id:
+        type: integer
       name:
         description: 名称
         type: string
-      peroids:
-        description: 是一个 RecordTime 的 JSON 数组
-        type: string
-      saveDay:
-        description: 保存的天数
-        type: integer
+    type: object
+  internal.BatchDelete-int64:
+    properties:
+      id:
+        description: 数据库 ID 数组
+        items:
+          type: integer
+        type: array
+    required:
+    - id
+    type: object
+  internal.BatchDelete-string:
+    properties:
+      id:
+        description: 数据库 ID 数组
+        items:
+          type: string
+        type: array
+    required:
+    - id
     type: object
   internal.Error:
     properties:
       detail:
         description: 详细信息
+        type: string
       phrase:
         description: 简短信息
         type: string
@@ -48,119 +87,135 @@ definitions:
         description: 行数
         type: integer
     type: object
-  streams.stream:
+  mediaservergroups.patchReq:
     properties:
-      startCallback:
-        description: 开始录像回调
-        maxLength: 255
+      describe:
+        description: 描述
+        maxLength: 128
         type: string
-      stopCallback:
-        description: 停止录像回调
-        maxLength: 255
+      name:
+        description: 名称
+        maxLength: 32
         type: string
-      stream:
-        description: 流的唯一标识
+    type: object
+  mediaservergroups.postReq:
+    properties:
+      describe:
+        description: 描述
+        maxLength: 128
+        type: string
+      name:
+        description: 名称
+        maxLength: 32
+        type: string
+    required:
+    - name
+    type: object
+  mediaservers.patchReq:
+    properties:
+      apiBaseURL:
+        description: API 地址 (http|https)://ip:port
+        type: string
+      apiCallTimeout:
+        description: 请求服务接口超时时间，单位，毫秒，默认 5000
+        minimum: 1000
+        type: integer
+      describe:
+        description: 描述
+        maxLength: 128
+        type: string
+      enable:
+        description: 是否禁用，0/1 ，默认 1
+        enum:
+        - 0
+        - 1
+        type: integer
+      mediaServerGroupID:
+        description: 所属的分组 ，默认 1
+        minimum: 1
+        type: integer
+      name:
+        description: 名称
+        maxLength: 32
+        type: string
+      privateIP:
+        description: 内网访问的 ip ，生成播放地址时使用，默认使用 apiBaseURL 中的 host
+        type: string
+      publicIP:
+        description: 外网访问的 ip ，生成播放地址时使用，默认使用 apiBaseURL 中的 host
+        type: string
+      secret:
+        description: 访问密钥
+        maxLength: 64
+        type: string
+    type: object
+  mediaservers.postReq:
+    properties:
+      apiBaseURL:
+        description: API 地址 (http|https)://ip:port
+        type: string
+      apiCallTimeout:
+        description: 请求服务接口超时时间，单位，毫秒，默认 5000
+        minimum: 1000
+        type: integer
+      describe:
+        description: 描述
+        maxLength: 128
+        type: string
+      enable:
+        description: 是否禁用，0/1 ，默认 1
+        enum:
+        - 0
+        - 1
+        type: integer
+      id:
+        description: id
+        maxLength: 32
+        type: string
+      mediaServerGroupID:
+        description: 所属的分组 ，默认 1
+        minimum: 1
+        type: integer
+      name:
+        description: 名称
+        maxLength: 32
+        type: string
+      privateIP:
+        description: 内网访问的 ip ，生成播放地址时使用，默认使用 apiBaseURL 中的 host
+        type: string
+      publicIP:
+        description: 外网访问的 ip ，生成播放地址时使用，默认使用 apiBaseURL 中的 host
+        type: string
+      secret:
+        description: 访问密钥
         maxLength: 64
         type: string
     required:
-    - startCallback
-    - stopCallback
-    - stream
+    - apiBaseURL
+    - id
+    - name
+    - secret
     type: object
-  util.GORMList-db_WeekPlan:
+  util.GORMList-db_MediaServer:
     properties:
       data:
         description: 列表
         items:
-          $ref: '#/definitions/db.WeekPlan'
+          $ref: '#/definitions/db.MediaServer'
         type: array
       total:
         description: 总数
         type: integer
     type: object
-  weekplans.patchReq:
+  util.GORMList-db_MediaServerGroup:
     properties:
-      enable:
-        description: |-
-          是否禁用
-          0: 禁用
-          1: 启用
-        enum:
-        - 0
-        - 1
-        type: integer
-      name:
-        description: 名称
-        maxLength: 32
-        type: string
-      peroids:
-        description: 一周的时间数组
+      data:
+        description: 列表
         items:
-          items:
-            $ref: '#/definitions/db.TimePeroid'
-          type: array
-        maxItems: 7
-        minItems: 1
+          $ref: '#/definitions/db.MediaServerGroup'
         type: array
-      saveDay:
-        description: 保存的天数
-        minimum: 1
-        type: integer
-    required:
-    - peroids
-    type: object
-  weekplans.postReq:
-    properties:
-      enable:
-        description: |-
-          是否禁用，默认是 1
-          0: 禁用
-          1: 启用
-        enum:
-        - 0
-        - 1
-        type: integer
-      name:
-        description: 名称
-        maxLength: 32
-        type: string
-      peroids:
-        description: 一周的时间数组
-        items:
-          items:
-            $ref: '#/definitions/db.TimePeroid'
-          type: array
-        maxItems: 7
-        minItems: 1
-        type: array
-      saveDay:
-        description: 保存的天数
-        minimum: 1
-        type: integer
-    required:
-    - name
-    - peroids
-    type: object
-  weekplans.weekplan:
-    properties:
-      enable:
-        description: |-
-          是否禁用
-          0: 禁用
-          1: 启用
-        type: integer
-      id:
-        type: string
-      isRecording:
-        type: boolean
-      name:
-        description: 名称
-        type: string
-      peroids:
-        description: 是一个 RecordTime 的 JSON 数组
-        type: string
-      saveDay:
-        description: 保存的天数
+      total:
+        description: 总数
         type: integer
     type: object
 info:
@@ -168,104 +223,17 @@ info:
   title: 接口文档
   version: 1.0.0
 paths:
-  /streams:
+  /media_server_groups:
     delete:
       consumes:
       - application/json
       parameters:
-      - description: Stream 数组
-        in: body
-        name: stream
-        required: true
-        schema:
-          items:
-            type: string
-          type: array
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: No Content
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/internal.Error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/internal.Error'
-      security:
-      - ApiKeyAuth: []
-      summary: 批量删除
-      tags:
-      - 媒体流
-  /streams/{stream}:
-    delete:
-      consumes:
-      - application/json
-      parameters:
-      - description: Stream
-        in: path
-        name: stream
-        required: true
-        type: string
-      responses:
-        "204":
-          description: No Content
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/internal.Error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/internal.Error'
-      summary: 删除
-      tags:
-      - 媒体流
-  /streams/{stream}/week_plans:
-    get:
-      parameters:
-      - description: Stream
-        in: path
-        name: stream
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/weekplans.weekplan'
-            type: array
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/internal.Error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/internal.Error'
-      summary: 获取周计划
-      tags:
-      - 媒体流
-  /week_plans:
-    delete:
-      consumes:
-      - application/json
-      parameters:
-      - description: 条件
+      - description: id 数组
         in: body
         name: data
         required: true
         schema:
-          items:
-            type: string
-          type: array
-      produces:
-      - application/json
+          $ref: '#/definitions/internal.BatchDelete-int64'
       responses:
         "204":
           description: No Content
@@ -277,11 +245,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/internal.Error'
-      security:
-      - ApiKeyAuth: []
       summary: 批量删除
       tags:
-      - 周计划
+      - 流媒体服务分组
     get:
       parameters:
       - description: 条数，小于 1 不匹配
@@ -289,14 +255,12 @@ paths:
         minimum: 1
         name: count
         type: integer
-      - description: 是否禁用，精确匹配
-        enum:
-        - 0
-        - 1
+      - description: 描述，模糊
         in: query
-        name: enable
-        type: integer
-      - description: 名称，模糊匹配
+        maxLength: 128
+        name: describe
+        type: string
+      - description: 名称，模糊
         in: query
         maxLength: 32
         name: name
@@ -310,18 +274,13 @@ paths:
         in: query
         name: order
         type: string
-      - description: 保存的天数
-        in: query
-        minimum: 1
-        name: saveDay
-        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/util.GORMList-db_WeekPlan'
+            $ref: '#/definitions/util.GORMList-db_MediaServerGroup'
         "400":
           description: Bad Request
           schema:
@@ -332,7 +291,7 @@ paths:
             $ref: '#/definitions/internal.Error'
       summary: 列表
       tags:
-      - 周计划
+      - 流媒体服务分组
     post:
       consumes:
       - application/json
@@ -342,7 +301,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/weekplans.postReq'
+          $ref: '#/definitions/mediaservergroups.postReq'
       produces:
       - application/json
       responses:
@@ -360,17 +319,15 @@ paths:
             $ref: '#/definitions/internal.Error'
       summary: 添加
       tags:
-      - 周计划
-  /week_plans/{id}:
+      - 流媒体服务分组
+  /media_server_groups/{id}:
     delete:
-      consumes:
-      - application/json
       parameters:
-      - description: WeekPlan.ID
+      - description: id
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       responses:
         "204":
           description: No Content
@@ -384,21 +341,21 @@ paths:
             $ref: '#/definitions/internal.Error'
       summary: 删除
       tags:
-      - 周计划
+      - 流媒体服务分组
     get:
       parameters:
-      - description: WeekPlan.ID
+      - description: id
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/db.WeekPlan'
+            $ref: '#/definitions/db.MediaServerGroup'
         "404":
           description: Not Found
           schema:
@@ -409,22 +366,22 @@ paths:
             $ref: '#/definitions/internal.Error'
       summary: 详情
       tags:
-      - 周计划
+      - 流媒体服务分组
     patch:
       consumes:
       - application/json
       parameters:
-      - description: WeekPlan.ID
+      - description: id
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       - description: 数据
         in: body
         name: data
         required: true
         schema:
-          $ref: '#/definitions/weekplans.patchReq'
+          $ref: '#/definitions/mediaservergroups.patchReq'
       produces:
       - application/json
       responses:
@@ -442,25 +399,18 @@ paths:
             $ref: '#/definitions/internal.Error'
       summary: 修改
       tags:
-      - 周计划
-  /week_plans/{id}/streams:
+      - 流媒体服务分组
+  /media_servers:
     delete:
       consumes:
       - application/json
       parameters:
-      - description: WeekPlan.ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: 自定义的媒体流 ID 数组
+      - description: id 数组
         in: body
         name: data
         required: true
         schema:
-          items:
-            type: string
-          type: array
+          $ref: '#/definitions/internal.BatchDelete-string'
       responses:
         "204":
           description: No Content
@@ -472,26 +422,87 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/internal.Error'
-      summary: 解绑媒体流
+      summary: 批量删除
       tags:
-      - 周计划
-    put:
+      - 流媒体服务
+    get:
+      parameters:
+      - description: 条数，小于 1 不匹配
+        in: query
+        minimum: 1
+        name: count
+        type: integer
+      - description: 是否在线，精确
+        enum:
+        - 0
+        - 1
+        in: query
+        name: describe
+        type: integer
+      - description: 是否禁用，精确
+        enum:
+        - 0
+        - 1
+        in: query
+        name: enable
+        type: integer
+      - description: id，模糊
+        in: query
+        maxLength: 32
+        name: id
+        type: string
+      - description: 所属的分组，精确
+        in: query
+        minimum: 1
+        name: mediaServerGroupID
+        type: integer
+      - description: 名称，模糊
+        in: query
+        maxLength: 32
+        name: name
+        type: string
+      - description: 偏移，小于 0 不匹配
+        in: query
+        minimum: 0
+        name: offset
+        type: integer
+      - description: 排序，"column [desc]"
+        in: query
+        name: order
+        type: string
+      - description: 访问密钥，模糊
+        in: query
+        maxLength: 64
+        name: secret
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.GORMList-db_MediaServer'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal.Error'
+      summary: 列表
+      tags:
+      - 流媒体服务
+    post:
       consumes:
       - application/json
       parameters:
-      - description: WeekPlan.ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: 媒体流数组
+      - description: 数据
         in: body
         name: data
         required: true
         schema:
-          items:
-            $ref: '#/definitions/streams.stream'
-          type: array
+          $ref: '#/definitions/mediaservers.postReq'
       produces:
       - application/json
       responses:
@@ -507,7 +518,87 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/internal.Error'
-      summary: 绑定媒体流
+      summary: 添加
       tags:
-      - 周计划
+      - 流媒体服务
+  /media_servers/{id}:
+    delete:
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal.Error'
+      summary: 删除
+      tags:
+      - 流媒体服务
+    get:
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.MediaServer'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal.Error'
+      summary: 详情
+      tags:
+      - 流媒体服务
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 数据
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/mediaservers.patchReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal.RowResult'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal.Error'
+      summary: 修改
+      tags:
+      - 流媒体服务
 swagger: "2.0"

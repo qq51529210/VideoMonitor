@@ -1,8 +1,9 @@
 package task
 
 import (
-	"onvif/discovery"
 	"time"
+
+	"github.com/qq51529210/video-monitor/onvif/discovery"
 )
 
 // Run 开始自动探测

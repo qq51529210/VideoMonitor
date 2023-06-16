@@ -25,7 +25,7 @@ type AddFFMPEGSourceReq struct {
 
 // addFFMPEGSourceRes 用于解析 addFFmpegSource 的返回值
 type addFFMPEGSourceRes struct {
-	Code int `json:"code"`
+	Error
 	Data struct {
 		// 唯一标识
 		Key string `json:"key"`
@@ -47,7 +47,7 @@ func (s *Server) AddFFMPEGSource(req *AddFFMPEGSourceReq) (string, error) {
 		return "", err
 	}
 	if _res.Code != 0 {
-		return "", CodeError(_res.Code)
+		return "", &_res.Error
 	}
 	return _res.Data.Key, nil
 }

@@ -34,7 +34,7 @@ type GetMP4RecordFileRes struct {
 
 // GetMP4RecordFile 调用 /index/api/getMp4RecordFile
 // 搜索文件系统，获取流对应的录像文件列表或日期文件夹列表
-func (s *Server) GetMP4RecordFile(req *GetMP4RecordFileReq, res *GetMP4RecordFileRes) error {
+func (s *Server) GetMP4RecordFile(req *GetMP4RecordFileReq) (*GetMP4RecordFileRes, error) {
 	var _res getMP4RecordFileRes
 	err := util.HTTP[any](http.MethodGet,
 		s.url("getMp4RecordFile"),
@@ -44,12 +44,11 @@ func (s *Server) GetMP4RecordFile(req *GetMP4RecordFileReq, res *GetMP4RecordFil
 		http.StatusOK,
 		s.APICallTimeout)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if _res.Code != 0 {
-		return CodeError(_res.Code)
+		return nil, CodeError(_res.Code)
 	}
-	res = _res.Data
 	//
-	return nil
+	return _res.Data, nil
 }

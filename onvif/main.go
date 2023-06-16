@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/qq51529210/video-monitor/onvif/api"
 	"github.com/qq51529210/video-monitor/onvif/db"
-	"onvif/task"
+	"github.com/qq51529210/video-monitor/onvif/task"
 
 	"github.com/qq51529210/log"
 	"github.com/qq51529210/util"
