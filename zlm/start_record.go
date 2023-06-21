@@ -1,6 +1,7 @@
 package zlm
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/qq51529210/util"
@@ -8,44 +9,57 @@ import (
 
 // StartRecordReq 是 StartRecord 的参数
 type StartRecordReq struct {
-	// 添加的流的虚拟主机，例如 __defaultVhost__
+	// 虚拟主机，例如 __defaultVhost__
 	VHost string `query:"vhost"`
-	// 添加的应用名，例如 live
+	// 应用名，例如 live
 	App string `query:"app"`
-	// 添加的流id，例如 test
+	// 流 id，例如 obs
 	Stream string `query:"stream"`
-	// 0为hls，1为mp4
+	// 0：hls ，1：mp4
 	Type string `query:"type"`
-	// 录像保存目录
+	// 录像文件保存自定义根目录，为空则采用配置文件设置
 	CustomizedPath string `query:"customized_path"`
-	// mp4录像切片时间大小,单位秒，置0则采用配置项
+	// MP4 录制的切片时间大小，单位秒，为空则采用配置文件设置
 	MaxSecond string `query:"max_second"`
 }
 
 // startRecordRes 是 StartRecord 的返回值
 type startRecordRes struct {
-	Code int `json:"code"`
+	apiRes
 	// 成功与否
 	Result bool `json:"result"`
 }
 
-// StartRecord 调用 /index/api/startRecord
-// 开始录制hls或MP4
-// 返回是否成功
+const (
+	apiPathStartRecord = "startRecord"
+)
+
+// StartRecord 调用 /index/api/startRecord 开始录制，返回是否成功
 func (s *Server) StartRecord(req *StartRecordReq) (bool, error) {
-	var _res startRecordRes
-	err := util.HTTP[any](http.MethodGet,
-		s.url("startRecord"),
+	ctx, cancel := context.WithTimeout(context.Background(), s.APICallTimeout)
+	defer cancel()
+	return s.StartRecordWithContext(ctx, req)
+}
+
+// StartRecordWithContext 调用 /index/api/startRecord 开始录制，返回是否成功
+func (s *Server) StartRecordWithContext(ctx context.Context, req *StartRecordReq) (bool, error) {
+	var res startRecordRes
+	err := util.HTTPWithContext[any](ctx, http.MethodGet,
+		s.url(apiPathStartRecord),
 		s.query(req),
 		nil,
-		&_res,
-		http.StatusOK,
-		s.APICallTimeout)
+		&res,
+		http.StatusOK)
 	if err != nil {
 		return false, err
 	}
-	if _res.Code != 0 {
-		return false, CodeError(_res.Code)
+	if res.Code != 0 {
+		return false, &Error{
+			Code: res.Code,
+			Msg:  res.Msg,
+			ID:   s.ID,
+			API:  apiPathStartRecord,
+		}
 	}
-	return _res.Result, nil
+	return res.Result, nil
 }

@@ -1,6 +1,7 @@
 package zlm
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/qq51529210/util"
@@ -14,64 +15,82 @@ type AddStreamProxyReq struct {
 	App string `query:"app"`
 	// 流ID
 	Stream string `query:"stream"`
-	// 拉流地址，例如rtmp://live.hkstv.hk.lxdns.com/live/hks2
+	// 拉流地址，例如 rtmp://live.hkstv.hk.lxdns.com/live/hks2
 	URL string `query:"url"`
-	// rtsp拉流时，拉流方式，0：tcp，1：udp，2：组播
+	// rtsp 拉流方式，0：tcp ，1：udp ，2：组播
 	RTPType string `query:"rtp_type"`
-	// 拉流超时时间，单位秒，float类型
+	// 超时时间，单位秒，float 类型
 	TimeoutSec string `query:"timeout_sec"`
-	// 拉流重试次数,不传此参数或传值<=0时，则无限重试
+	// 重试次数,不传或 0 无限重试
 	RetryCount string `query:"retry_count"`
-	// 是否转换成hls协议，0/1
+	// 是否转换成 hls 协议，0 / 1
 	EnableHLS string `query:"enable_hls"`
-	// 是否转换成mp4协议，0/1
+	// 是否 mp4 录制，0 / 1
 	EnableMP4 string `query:"enable_mp4"`
-	// 是否转换成rtsp协议，0/1
+	// 是否转换成 rtsp/webrtc 协议，0 / 1
 	EnableRTSP string `query:"enable_rtsp"`
-	// 是否转换成rtmp/flv协议，0/1
+	// 是否转换成 rtmp/flv 协议，0 / 1
 	EnableRTMP string `query:"enable_rtmp"`
-	// 是否转换成http-ts/ws-ts协议，0/1
+	// 是否转换成 http-ts/ws-ts 协议，0 / 1
 	EnableTS string `query:"enable_ts"`
-	// 是否转换成http-fmp4/ws-fmp4协议，0/1
+	// 是否转换成 http-fmp4/ws-fmp4 协议，0 / 1
 	EnableFMP4 string `query:"enable_fmp4"`
-	// 转协议时是否开启音频
+	// 转协议是否开启音频，0 / 1
 	EnableAudio string `query:"enable_audio"`
-	// 转协议时，无音频是否添加静音aac音频
+	// 转协议无音频是否添加静音 aac 音频，0 / 1
 	AddMuteAudio string `query:"add_mute_audio"`
-	// mp4录制文件保存根目录，置空使用默认
+	// mp4 录制文件保存根目录，置空使用默认
 	MP4SavePath string `query:"mp4_save_path"`
-	// mp4录制切片大小，单位秒
+	// mp4 录制切片大小，单位秒
 	MP4MaxSecond string `query:"mp4_max_second"`
-	// hls文件保存保存根目录，置空使用默认
+	// hls 文件保存保存根目录，置空使用默认
 	HLSSavePath string `query:"hls_save_path"`
+	// 是否修改原始时间戳
+	// 0：不改变
+	// 1：采用接收数据时的系统时间戳
+	// 2：采用源视频流时间戳相对时间戳
+	ModifyStamp string `query:"modify_stamp"`
 }
 
 // addStreamProxyRes 用于解析 addStreamProxy 的返回值
 type addStreamProxyRes struct {
-	Error
+	apiRes
 	Data struct {
 		// 流的唯一标识
 		Key string `json:"key"`
 	} `json:"data"`
 }
 
-// AddStreamProxy 调用 /index/api/addStreamProxy
-// 动态添加rtsp/rtmp/hls拉流代理(只支持H264/H265/aac/G711负载)
-// 返回 key
+const (
+	apiPathAddStreamProxy = "addStreamProxy"
+)
+
+// AddStreamProxy 调用 /index/api/addStreamProxy 返回 key
 func (s *Server) AddStreamProxy(req *AddStreamProxyReq) (string, error) {
-	var _res addStreamProxyRes
-	err := util.HTTP[any](http.MethodGet,
-		s.url("addStreamProxy"),
+	ctx, cancel := context.WithTimeout(context.Background(), s.APICallTimeout)
+	defer cancel()
+	return s.AddStreamProxyWithContext(ctx, req)
+}
+
+// AddStreamProxyWithContext 调用 /index/api/addStreamProxy 返回 key
+func (s *Server) AddStreamProxyWithContext(ctx context.Context, req *AddStreamProxyReq) (string, error) {
+	var res addStreamProxyRes
+	err := util.HTTPWithContext[any](ctx, http.MethodGet,
+		s.url(apiPathAddStreamProxy),
 		s.query(req),
 		nil,
-		&_res,
-		http.StatusOK,
-		s.APICallTimeout)
+		&res,
+		http.StatusOK)
 	if err != nil {
 		return "", err
 	}
-	if _res.Code != 0 {
-		return "", &_res.Error
+	if res.Code != 0 {
+		return "", &Error{
+			Code: res.Code,
+			Msg:  res.Msg,
+			ID:   s.ID,
+			API:  apiPathAddStreamProxy,
+		}
 	}
-	return _res.Data.Key, nil
+	return res.Data.Key, nil
 }

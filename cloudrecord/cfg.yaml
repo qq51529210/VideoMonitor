@@ -1,5 +1,5 @@
 name: cloud-record-service-1
-port: 8002
+port: 8003
 log:
  rootDir: log
  maxFileSize: 5M

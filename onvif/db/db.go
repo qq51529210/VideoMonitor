@@ -29,13 +29,13 @@ func Init(uri string, cache bool) error {
 	if err != nil {
 		return err
 	}
+	// 数据访问
+	initDA(db, cache)
 	// 数据
 	err = initData()
 	if err != nil {
 		return err
 	}
-	// 数据访问
-	initDA(db, cache)
 	//
 	return nil
 }

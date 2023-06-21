@@ -72,10 +72,10 @@ func (g *Group) snapshotRoutine(s *Server, m *mediaInfo, timeout string) {
 	// 优先使用 rtsp 然后是 rtmp
 	var err error
 	if s.Cfg.RTSPPort != "" {
-		req.URL = fmt.Sprintf("rtsp://127.0.0.1:%s/%s/%s", s.Cfg.RTSPPort, m.App, m.Stream)
+		req.URL = fmt.Sprintf("rtsp://localhost:%s/%s/%s", s.Cfg.RTSPPort, m.App, m.Stream)
 		err = s.SaveSnap(&req, filepath.Join(s.SnapDir, m.App), m.Stream)
 	} else if s.Cfg.RTMPPort != "" {
-		req.URL = fmt.Sprintf("rtmp://127.0.0.1:%s/%s/%s", s.Cfg.RTMPPort, m.App, m.Stream)
+		req.URL = fmt.Sprintf("rtmp://localhost:%s/%s/%s", s.Cfg.RTMPPort, m.App, m.Stream)
 		err = s.SaveSnap(&req, filepath.Join(s.SnapDir, m.App), m.Stream)
 	}
 	if err != nil {
