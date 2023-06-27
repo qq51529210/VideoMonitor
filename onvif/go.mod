@@ -6,8 +6,9 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-playground/validator/v10 v10.14.0
 	github.com/qq51529210/log v0.0.0-20230615091426-6d64dbedda04
-	github.com/qq51529210/util v0.0.0-20230615145616-6cef2121d3eb
+	github.com/qq51529210/util v0.0.0-20230621151427-4e3292ff0da6
 	github.com/qq51529210/uuid v0.0.0-20230116075911-debb68a3e58d
+	github.com/qq51529210/video-monitor/zlm v0.0.0
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.1
@@ -63,3 +64,5 @@ require (
 	modernc.org/memory v1.5.0 // indirect
 	modernc.org/sqlite v1.22.1 // indirect
 )
+
+replace github.com/qq51529210/video-monitor/zlm => ../zlm

@@ -13,6 +13,7 @@ import (
 // @version	1.0.0
 func main() {
 	defer func() {
+		// 抓异常
 		log.Recover(recover())
 	}()
 	// 配置
@@ -31,7 +32,7 @@ func main() {
 		panic(err)
 	}
 	// 检查
-	err = task.Run(&_cfg.Discovery)
+	err = task.Run(&_cfg.Task)
 	if err != nil {
 		panic(err)
 	}

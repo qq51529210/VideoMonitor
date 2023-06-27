@@ -3,6 +3,11 @@ module github.com/qq51529210/video-monitor/zlm
 go 1.20
 
 require (
+	github.com/qq51529210/log v0.0.0-20230615091426-6d64dbedda04
+	github.com/qq51529210/util v0.0.0-20230621151427-4e3292ff0da6
+)
+
+require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/glebarez/go-sqlite v1.21.1 // indirect
 	github.com/glebarez/sqlite v1.8.0 // indirect
@@ -11,8 +16,6 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
-	github.com/qq51529210/log v0.0.0-20230615091426-6d64dbedda04 // indirect
-	github.com/qq51529210/util v0.0.0-20230621151427-4e3292ff0da6 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	golang.org/x/sys v0.8.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

@@ -4,12 +4,13 @@ import (
 	"errors"
 
 	"github.com/qq51529210/util"
+	"github.com/qq51529210/video-monitor/zlm"
 	"gorm.io/gorm"
 )
 
 var (
-	Enable  = int8(1)
-	Disable = int8(0)
+	True  = int8(1)
+	False = int8(0)
 )
 
 var (
@@ -50,8 +51,8 @@ func initDB(uri string) (*gorm.DB, error) {
 // initTable 创建表
 func initTable(db *gorm.DB) error {
 	return db.AutoMigrate(
-		&MediaServerGroup{},
-		&MediaServer{},
+		&zlm.MediaServerGroup{},
+		&zlm.MediaServer{},
 		&Discovery{},
 		// &WeekPlanStream{},
 	)
@@ -59,8 +60,8 @@ func initTable(db *gorm.DB) error {
 
 // initDA 创建各个数据访问
 func initDA(db *gorm.DB, cache bool) {
-	initMediaServerGroupDA(db, false)
-	initMediaServerDA(db, false)
+	zlm.InitMediaServerGroupDA(db, false)
+	zlm.InitMediaServerDA(db, false)
 	initDiscoveryDA(db, false)
 	initDeviceDA(db, cache)
 	initChannelDA(db, cache)
@@ -68,7 +69,7 @@ func initDA(db *gorm.DB, cache bool) {
 
 // initData 初始化默认数据
 func initData() error {
-	err := initDefaultMediaServerGroup()
+	err := zlm.InitDefaultMediaServerGroup()
 	if err != nil {
 		return err
 	}

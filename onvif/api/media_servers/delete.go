@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/qq51529210/video-monitor/onvif/api/internal"
-	"github.com/qq51529210/video-monitor/onvif/db"
+	"github.com/qq51529210/video-monitor/zlm"
 )
 
 // @Summary  删除
@@ -24,7 +24,7 @@ func delete(ctx *gin.Context) {
 		return
 	}
 	// 数据库
-	_, err = db.MediaServerDA.Delete(id.ID)
+	_, err = zlm.MediaServerDA.Delete(id.ID)
 	if err != nil {
 		internal.WriteErrorDataBaseAccess(ctx, err)
 		return
@@ -50,7 +50,7 @@ func batchDelete(ctx *gin.Context) {
 		return
 	}
 	// 数据库
-	_, err = db.MediaServerDA.BatchDelete(req)
+	_, err = zlm.MediaServerDA.BatchDelete(req)
 	if err != nil {
 		internal.WriteErrorDataBaseAccess(ctx, err)
 		return

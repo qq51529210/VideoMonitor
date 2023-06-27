@@ -10,6 +10,6 @@ log:
 db:
  url: mysql://root:1231@tcp(127.0.0.1:3306)/onvif?charset=utf8mb4
  enableCache: true
-discovery:
+task:
   #multicastAddr: ""
   #interval: 0

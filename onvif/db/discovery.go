@@ -30,17 +30,15 @@ func initDiscoveryDA(db *gorm.DB, cache bool) {
 // Discovery 表示自动发现的列表
 type Discovery struct {
 	// 地址
-	IPAddr string `json:"ipAddr" gorm:"type:varchar(255);not null;primaryKey"`
-	// 数据库的创建时间，时间戳，
-	CreatedAt int64 `json:"createdAt" gorm:""`
-	// 数据库的更新时间
-	UpdatedAt int64 `json:"updatedAt" gorm:""`
+	IPAddr string `json:"ipAddr" gorm:"type:varchar(40);not null;primaryKey"`
+	// 发现的时间戳
+	Time int64 `json:"time" gorm:""`
 }
 
 // DiscoveryQuery 是 Discovery 的查询参数
 type DiscoveryQuery struct {
-	// 模糊查询
-	IPAddr *string `form:"ipAddr" json:"ipAddr" binding:"omitempty,max=255" gq:"like"`
+	// 地址，模糊查询
+	IPAddr *string `form:"ipAddr" json:"ipAddr" binding:"omitempty,max=40" gq:"like"`
 }
 
 // Init 实现 Query 接口

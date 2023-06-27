@@ -8,7 +8,7 @@ import (
 	"github.com/qq51529210/util"
 	"github.com/qq51529210/uuid"
 	"github.com/qq51529210/video-monitor/onvif/api/internal"
-	"github.com/qq51529210/video-monitor/onvif/db"
+	"github.com/qq51529210/video-monitor/zlm"
 )
 
 type postReq struct {
@@ -60,10 +60,10 @@ func post(ctx *gin.Context) {
 		req.PrivateIP = &_u.Host
 	}
 	// 数据库
-	var model db.MediaServer
+	var model zlm.MediaServer
 	util.CopyStruct(&model, &req)
 	model.ID = uuid.LowerV1WithoutHyphen()
-	_, err = db.MediaServerDA.Add(&model)
+	_, err = zlm.MediaServerDA.Add(&model)
 	if err != nil {
 		internal.WriteErrorDataBaseAccess(ctx, err)
 		return

@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/qq51529210/util"
 	"github.com/qq51529210/video-monitor/onvif/api/internal"
-	"github.com/qq51529210/video-monitor/onvif/db"
+	"github.com/qq51529210/video-monitor/zlm"
 )
 
 type patchReq struct {
@@ -46,9 +46,9 @@ func patch(ctx *gin.Context) {
 		return
 	}
 	// 数据库
-	var model db.MediaServerGroup
+	var model zlm.MediaServerGroup
 	util.CopyStruct(&model, &req)
-	rows, err := db.MediaServerGroupDA.Update(&model)
+	rows, err := zlm.MediaServerGroupDA.Update(&model)
 	if err != nil {
 		internal.WriteErrorDataBaseAccess(ctx, err)
 		return

@@ -1,6 +1,8 @@
 package db
 
 import (
+	"time"
+
 	"github.com/qq51529210/util"
 	"gorm.io/gorm"
 )
@@ -50,6 +52,8 @@ type Device struct {
 	HardwareID *string `json:"hardwareID" gorm:"type:char(64)"`
 	// 是否在线，0/1 ，默认 0
 	Online *int8 `json:"online" gorm:"not null;default:0"`
+	// 时间
+	Time time.Duration `json:"-" gorm:"-"`
 }
 
 // DeviceQuery 是 Device 的查询参数
@@ -80,4 +84,26 @@ type DeviceQuery struct {
 // Init 实现 Query 接口
 func (q *DeviceQuery) Init(db *gorm.DB) *gorm.DB {
 	return util.GORMInitQuery(db, q)
+}
+
+// UpdateDeviceOnline 更新 online 字段
+func UpdateDeviceOnline(id int64, online int8) error {
+	// 数据库
+	db := DeviceDA.Model().
+		Where("`ID` = ?", id).
+		UpdateColumn("Online", online)
+	if db.Error != nil {
+		return db.Error
+	}
+	// 缓存
+	if DeviceDA.IsCache() {
+		DeviceDA.Lock()
+		model := DeviceDA.D[id]
+		if model != nil {
+			model.Online = &online
+		}
+		DeviceDA.Unlock()
+	}
+	//
+	return nil
 }
